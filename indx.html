@@ -1067,6 +1067,70 @@
 
     .hidden { display: none !important; }
 
+    /* ===== MOBILE PARAGRAPH CONTEXT MENU ===== */
+    .mobile-paragraph-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: var(--spectrum-gray-50);
+      border: 1px solid var(--spectrum-gray-300);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 700;
+      min-width: 200px;
+      padding: 8px 0;
+      flex-direction: column;
+    }
+    body.dark .mobile-paragraph-menu {
+      background: #272727;
+      border-color: #3a3a3a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .mobile-paragraph-menu.active {
+      display: flex;
+    }
+
+    .mobile-paragraph-menu-item {
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--spectrum-gray-800);
+      font-size: 14px;
+      font-weight: 500;
+      text-align: left;
+      font-family: inherit;
+      transition: background-color 150ms;
+    }
+    body.dark .mobile-paragraph-menu-item {
+      color: #e6e2dd;
+    }
+
+    .mobile-paragraph-menu-item:hover {
+      background-color: var(--spectrum-gray-100);
+    }
+    body.dark .mobile-paragraph-menu-item:hover {
+      background-color: #3a3a3a;
+    }
+
+    .mobile-paragraph-menu-item:active {
+      background-color: var(--spectrum-gray-200);
+    }
+    body.dark .mobile-paragraph-menu-item:active {
+      background-color: #3f3f3f;
+    }
+
+    .mobile-paragraph-menu-divider {
+      height: 1px;
+      background: var(--spectrum-gray-300);
+      margin: 4px 0;
+    }
+    body.dark .mobile-paragraph-menu-divider {
+      background: #3a3a3a;
+    }
+
     /* ===== MOBILE NAV ===== */
     .mobile-bottom-nav {
       display: none;
@@ -1358,7 +1422,7 @@
         <!-- ===== READER MODE ===== -->
         <div class="reader-mode" id="readerMode">
           <h1 class="chapter-header" id="chapterHeader">On Love</h1>
-          <div class="chapter-meta" id="chapterMeta"><span>AI-enabled reader</span><span>Select text for tools</span></div>
+          <div class="chapter-meta" id="chapterMeta"><span>AI-enabled reader</span><span id="toolsHint">Click paragraph for tools</span></div>
           <div class="text-content" id="textContent"></div>
         </div>
       </div>
@@ -1542,6 +1606,13 @@
   </button>
 </div>
 
+<!-- Mobile Paragraph Context Menu -->
+<div class="mobile-paragraph-menu" id="mobileParagraphMenu">
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphExplain" onclick="handleMobileParagraphAction('explain')">📖 Explain</button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphRead" onclick="handleMobileParagraphAction('read')">🔊 Read Aloud</button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphSummarize" onclick="handleMobileParagraphAction('summarize')">✏️ Summarize</button>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="libs/pdfjs/pdf.min.js"></script>
@@ -1636,6 +1707,64 @@ function closeMobileMenu() {
   overlay.style.display = 'none';
   document.body.style.overflow = '';
 }
+
+// ===== MOBILE PARAGRAPH CONTEXT MENU =====
+let mobileSelectedParagraphText = '';
+const isMobileDevice = () => window.innerWidth <= 768;
+
+function showMobileParagraphMenu(event, paragraphText) {
+  if (!isMobileDevice()) return;
+  
+  mobileSelectedParagraphText = paragraphText.substring(0, 500); // Limit to 500 chars
+  const menu = $('mobileParagraphMenu');
+  
+  // Position the menu near the tap point
+  const x = Math.min(event.clientX || event.touches?.[0].clientX || 0, window.innerWidth - 220);
+  const y = Math.min(event.clientY || event.touches?.[0].clientY || 0, window.innerHeight - 150);
+  
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.classList.add('active');
+}
+
+function hideMobileParagraphMenu() {
+  const menu = $('mobileParagraphMenu');
+  menu.classList.remove('active');
+}
+
+async function handleMobileParagraphAction(action) {
+  if (!mobileSelectedParagraphText) {
+    showToast('No text selected', 'error');
+    hideMobileParagraphMenu();
+    return;
+  }
+  
+  hideMobileParagraphMenu();
+  
+  if (isNarrating) {
+    showToast('Narration in progress...', 'info');
+    return;
+  }
+  
+  try {
+    if (action === 'explain') {
+      await callAI(mobileSelectedParagraphText, 'explain');
+    } else if (action === 'read') {
+      await callAI(mobileSelectedParagraphText, 'readpage');
+    } else if (action === 'summarize') {
+      await callAI(mobileSelectedParagraphText, 'summarize');
+    }
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// Close menu when clicking elsewhere
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.mobile-paragraph-menu')) {
+    hideMobileParagraphMenu();
+  }
+});
 
 function getPageContext() { return textContent.textContent || ''; }
 
@@ -1820,6 +1949,16 @@ function renderPages() {
   p.setAttribute('data-page', pageIndex);
   p.className = 'page-block';
   p.textContent = paragraph;
+  
+  // Add mobile paragraph click handler
+  if (isMobileDevice()) {
+    p.style.cursor = 'pointer';
+    p.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showMobileParagraphMenu(e, paragraph);
+    });
+  }
+  
   container.appendChild(p);
 
   sentenceElements = Array.from(container.querySelectorAll('.sentence'));
@@ -2071,6 +2210,19 @@ function renderPdfPage(pageNumber) {
   const pdfTitle = pdfState.title || 'Uploaded PDF';
 
   textContent.innerHTML = pageHtml;
+
+  // Add mobile paragraph click listeners for PDF
+  if (isMobileDevice()) {
+    const paragraphs = textContent.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      p.style.cursor = 'pointer';
+      p.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = p.textContent || '';
+        showMobileParagraphMenu(e, text);
+      });
+    });
+  }
 
   chapterMeta.innerHTML = `<span>📄 PDF document</span><span>Page ${safePage} of ${pdfState.totalPages}</span>`;
 
