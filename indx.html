@@ -1066,6 +1066,224 @@
     }
 
     .hidden { display: none !important; }
+
+    /* ===== MOBILE NAV ===== */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: var(--spectrum-gray-50);
+      border-top: var(--spectrum-border-width) solid var(--spectrum-gray-300);
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 500;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    body.dark .mobile-bottom-nav {
+      background: #272727;
+      border-top-color: #3a3a3a;
+    }
+
+    .mobile-nav-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--spectrum-gray-700);
+      font-size: 11px;
+      font-weight: 500;
+      transition: color 150ms ease-in-out;
+    }
+    body.dark .mobile-nav-button {
+      color: #b0a89c;
+    }
+
+    .mobile-nav-button svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .mobile-nav-button:active {
+      color: var(--spectrum-blue-500);
+    }
+    body.dark .mobile-nav-button:active {
+      color: #9ab7ff;
+    }
+
+    .mobile-menu-drawer {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background: var(--spectrum-gray-50);
+      border-right: var(--spectrum-border-width) solid var(--spectrum-gray-300);
+      z-index: 600;
+      flex-direction: column;
+      padding: 20px 0;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 300ms ease-in-out;
+    }
+    body.dark .mobile-menu-drawer {
+      background: #272727;
+      border-right-color: #3a3a3a;
+    }
+
+    .mobile-menu-drawer.open {
+      transform: translateX(0);
+    }
+
+    .mobile-menu-drawer-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 550;
+    }
+
+    .mobile-menu-drawer.open ~ .mobile-menu-drawer-overlay {
+      display: block;
+    }
+
+    .mobile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      border: none;
+      background: none;
+      color: var(--spectrum-gray-800);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 150ms ease-in-out;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    body.dark .mobile-menu-item {
+      color: #e6e2dd;
+    }
+
+    .mobile-menu-item:hover {
+      background-color: var(--spectrum-gray-100);
+    }
+    body.dark .mobile-menu-item:hover {
+      background-color: #3a3a3a;
+    }
+
+    .mobile-menu-item:active {
+      background-color: var(--spectrum-gray-200);
+    }
+    body.dark .mobile-menu-item:active {
+      background-color: #3f3f3f;
+    }
+
+    .mobile-menu-item svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .mobile-menu-divider {
+      height: 1px;
+      background: var(--spectrum-gray-300);
+      margin: 8px 0;
+    }
+    body.dark .mobile-menu-divider {
+      background: #3a3a3a;
+    }
+
+    /* ===== MOBILE LAYOUT ===== */
+    @media (max-width: 768px) {
+      .sidebar-left,
+      .sidebar-right {
+        display: none;
+      }
+
+      .container {
+        flex-direction: column;
+      }
+
+      .main-content {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .reader-area {
+        padding: 20px 20px 100px;
+      }
+
+      .mobile-bottom-nav {
+        display: flex;
+      }
+
+      .mobile-menu-drawer {
+        display: flex;
+      }
+
+      .mobile-menu-drawer-overlay {
+        display: none;
+      }
+
+      .header-bar {
+        padding: 0 16px;
+        height: 50px;
+      }
+
+      .book-title {
+        font-size: 14px;
+        max-width: 150px;
+      }
+
+      .reading-stats {
+        gap: 12px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .reader-area {
+        padding: 16px 16px 100px;
+      }
+
+      .header-bar {
+        padding: 0 12px;
+      }
+
+      .book-title {
+        font-size: 12px;
+        max-width: 100px;
+      }
+
+      .mobile-bottom-nav {
+        height: 80px;
+      }
+
+      .mobile-nav-button {
+        padding: 4px 8px;
+        font-size: 10px;
+      }
+
+      .mobile-nav-button svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1274,6 +1492,56 @@
   <div id="searchResults" style="color:var(--spectrum-gray-600);font-size:14px;">Results will appear here.</div>
 </div></div>
 
+<!-- Mobile Menu Drawer -->
+<div class="mobile-menu-drawer" id="mobileMenuDrawer">
+  <button class="mobile-menu-item" id="mobileHomeBtn" onclick="closeMobileMenu();document.getElementById('homeBtn').click();">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="mobile-menu-item" id="mobileLibraryBtn" onclick="closeMobileMenu();document.getElementById('libraryBtn').click();">
+    <svg viewBox="0 0 24 24"><path d="M4 6h5v5H4V6zm7 0h5v5h-5V6zm7 0h5v5h-5V6zM4 13h5v5H4v-5zm7 0h5v5h-5v-5zm7 0h5v5h-5v-5z"/></svg>
+    <span>Library</span>
+  </button>
+  <button class="mobile-menu-item" id="mobileSearchBtn" onclick="closeMobileMenu();document.getElementById('searchBtn').click();">
+    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    <span>Search</span>
+  </button>
+  <button class="mobile-menu-item" id="mobileBookmarksBtn" onclick="closeMobileMenu();document.getElementById('bookmarksBtn').click();">
+    <svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-1.99.9-1.99 2L3 21l9-4 9 4V5c0-1.1-.89-2-2-2z"/></svg>
+    <span>Bookmarks</span>
+  </button>
+  <div class="mobile-menu-divider"></div>
+  <button class="mobile-menu-item" id="mobileDarkModeBtn" onclick="closeMobileMenu();document.getElementById('darkModeToggle').click();">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+    <span>Dark Mode</span>
+  </button>
+</div>
+<div class="mobile-menu-drawer-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
+
+<!-- Mobile Bottom Navigation Bar -->
+<div class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="mobile-nav-button" id="mobileMenuBtn" onclick="openMobileMenu();" title="Menu">
+    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+    <span>Menu</span>
+  </button>
+  <button class="mobile-nav-button" onclick="document.getElementById('libraryBtn').click();" title="Library">
+    <svg viewBox="0 0 24 24"><path d="M4 6h5v5H4V6zm7 0h5v5h-5V6zm7 0h5v5h-5V6zM4 13h5v5H4v-5zm7 0h5v5h-5v-5zm7 0h5v5h-5v-5z"/></svg>
+    <span>Library</span>
+  </button>
+  <button class="mobile-nav-button" onclick="document.getElementById('homeBtn').click();" title="Home">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="mobile-nav-button" onclick="document.getElementById('aiReadPageBtn').click();" title="Read">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <span>Read</span>
+  </button>
+  <button class="mobile-nav-button" id="mobileUploadBtn" onclick="document.getElementById('uploadFileInput').click();" title="Upload">
+    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+    <span>Upload</span>
+  </button>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script src="libs/pdfjs/pdf.min.js"></script>
@@ -1350,6 +1618,24 @@ function showToast(msg, type = 'info', dur = 3000) {
   toast.classList.add('show');
   clearTimeout(toast._t);
   toast._t = setTimeout(() => toast.classList.remove('show'), dur);
+}
+
+// ===== MOBILE MENU =====
+function openMobileMenu() {
+  const drawer = $('mobileMenuDrawer');
+  const overlay = $('mobileMenuOverlay');
+  drawer.classList.add('open');
+  overlay.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMenu() {
+  const drawer = $('mobileMenuDrawer');
+  const overlay = $('mobileMenuOverlay');
+  drawer.classList.remove('open');
+  overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
 }
 
 function getPageContext() { return textContent.textContent || ''; }
