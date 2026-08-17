@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: book-reader
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node backend.js
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: ELEVENLABS_VOICE_ID
+        sync: false
