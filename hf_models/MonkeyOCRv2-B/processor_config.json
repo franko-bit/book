@@ -1,0 +1,6 @@
+{
+  "auto_map": {
+    "AutoProcessor": "configuration_monkeyocrv2vit.MonkeyOCRv2Processor"
+  },
+  "processor_class": "MonkeyOCRv2Processor"
+}

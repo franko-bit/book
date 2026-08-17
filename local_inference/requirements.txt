@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+Pillow
+numpy
+easyocr
+pytesseract
+pyttsx3
+# optional: transformers, torch for advanced local HF model use
+# transformers
+# torch
