@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { Readable } from 'node:stream';
 import dotenv from 'dotenv';
 import cloudinary from 'cloudinary';
 import multer from 'multer';
@@ -28,72 +29,108 @@ app.use(express.json({ limit: '5mb' }));
 
 // Groq API endpoint (proxied)
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const DEFAULT_GROQ_MODEL = 'qwen/qwen3.6-27b';
+const UNSUPPORTED_GROQ_MODELS = new Set([
+  'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'llama-3.1-70b-versatile',
+  'mixtral-8x7b-32768',
+  'llama-3.3-70b-specdec',
+  'meta-llama/llama-3.3-70b-versatile',
+  'meta-llama/llama-4-scout-17b-16e-instruct',
+  'meta-llama/llama-4-maverick-17b-128e-instruct',
+  'deepseek-r1-distill-llama-70b'
+]);
+
+function sanitizeGroqText(rawText) {
+  return String(rawText || '')
+    .replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '')
+    .replace(/<\s*\/\s*think\s*>/gi, '')
+    .replace(/```json|```/gi, '')
+    .trim();
+}
+
+function getGroqModelCandidates(requestedModel) {
+  const normalized = String(requestedModel || '').trim();
+  const placeholderValues = ['replace_with_supported_model', 'REPLACE_WITH_SUPPORTED_MODEL'];
+  const candidates = [];
+
+  if (normalized && !placeholderValues.includes(normalized)) {
+    candidates.push(normalized);
+  }
+
+  if (!candidates.length || UNSUPPORTED_GROQ_MODELS.has(normalized)) {
+    candidates.push(DEFAULT_GROQ_MODEL);
+  }
+
+  return [...new Set(candidates)];
+}
 
 app.post('/api/groq', async (req, res) => {
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY not set on server' });
-  
-  // Use model provided in the request body. Do not require a server-side GROQ_MODEL.
-  const body = { ...req.body };
-  const model = body.model;
-  const placeholderValues = ['replace_with_supported_model', 'REPLACE_WITH_SUPPORTED_MODEL'];
 
-  if (!model || placeholderValues.includes(String(model))) {
-    return res.status(400).json({
-      error: 'Model not specified or uses placeholder. Include a valid Groq model name in the request body as `model`, e.g. { "model": "llama-3.3-70b-versatile", ... }'
-    });
-  }
-  
-  // Retry logic for Groq API calls
+  const body = { ...req.body };
+  const modelCandidates = getGroqModelCandidates(body.model);
   let lastError = null;
-  const maxRetries = 2;
-  const timeoutMs = 20000; // 20 second timeout (increased from default 10s)
-  
+  const maxRetries = Math.min(3, modelCandidates.length + 1);
+  const timeoutMs = 20000;
+
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const currentModel = modelCandidates.shift();
+    if (!currentModel) break;
+
+    const payload = { ...body, model: currentModel };
+
     try {
-      console.log(`📤 Proxying to Groq (attempt ${attempt}/${maxRetries}): model=${model}, messages=${body.messages?.length || 0}`);
-      
+      console.log(`📤 Proxying to Groq (attempt ${attempt}/${maxRetries}): model=${currentModel}, messages=${payload.messages?.length || 0}`);
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-      
+
       const resp = await fetch(GROQ_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
       console.log(`📥 Groq response: ${resp.status}`);
-      
-      if (!resp.ok) {
-        const errorText = await resp.text();
-        console.error(`❌ Groq error (${resp.status}):`, errorText.substring(0, 200));
-      }
-      
+
       const contentType = resp.headers.get('content-type') || 'application/json';
       const text = await resp.text();
+
+      if (!resp.ok) {
+        const errorText = text.substring(0, 200);
+        console.error(`❌ Groq error (${resp.status}):`, errorText);
+
+        if ((resp.status === 400 || resp.status === 404) && modelCandidates.length > 0) {
+          console.warn(`🔁 Retrying with Groq fallback model: ${modelCandidates[0]}`);
+          continue;
+        }
+      }
+
       res.status(resp.status).type(contentType).send(text);
       return;
-      
+
     } catch (err) {
       lastError = err;
       console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
-      
-      if (attempt < maxRetries) {
-        const delay = attempt * 1000; // 1s, then 2s
+
+      if (attempt < maxRetries && modelCandidates.length > 0) {
+        const delay = attempt * 1000;
         console.log(`⏳ Waiting ${delay}ms before retry...`);
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }
-  
-  // All retries exhausted
+
   console.error('💥 Groq proxy failed after all retries:', lastError?.message);
-  res.status(502).json({ 
+  res.status(502).json({
     error: 'Unable to reach Groq API',
     details: lastError?.message || 'Connection timeout'
   });
@@ -109,10 +146,11 @@ app.post('/api/tts', async (req, res) => {
   const { text, voice_id } = req.body;
   if (!text) return res.status(400).json({ error: 'text is required' });
 
-  const url = ELEVENLABS_URL_TEMPLATE.replace('{voice_id}', voice_id || 'EXAVITQu4vr4xnSDxMaL');
+  const selectedVoiceId = voice_id || process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
+  const url = ELEVENLABS_URL_TEMPLATE.replace('{voice_id}', selectedVoiceId);
   const payload = {
     text,
-    model_id: 'eleven_monolingual_v1',
+    model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
     voice_settings: {
       stability: 0.5,
       similarity_boost: 0.75
@@ -147,7 +185,7 @@ app.post('/api/tts', async (req, res) => {
       // Stream audio response
       res.setHeader('Content-Type', 'audio/mpeg');
       res.setHeader('Transfer-Encoding', 'chunked');
-      response.body.pipe(res);
+      Readable.fromWeb(response.body).pipe(res);
       return;
       
     } catch (err) {
@@ -190,7 +228,7 @@ app.post('/api/translate', async (req, res) => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: DEFAULT_GROQ_MODEL,
           messages: [
             {
               role: 'user',
@@ -210,7 +248,7 @@ app.post('/api/translate', async (req, res) => {
       }
 
       const result = await response.json();
-      const translated = result.choices?.[0]?.message?.content || '';
+      const translated = sanitizeGroqText(result.choices?.[0]?.message?.content || '');
       return res.json({ translated });
 
     } catch (err) {
@@ -322,12 +360,53 @@ app.get('/api/env', (req, res) => {
 });
 
 // ===== CLOUDINARY BOOKS LIST =====
-app.get('/api/cloudinary-books', async (req, res) => {
+function getLocalBooks() {
   try {
-    const result = await cloudinary.v2.search
-      .expression(`folder="book"`)
-      .max_results(100)
-      .execute();
+    return fs.readdirSync(uploadsDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && /\.pdf$/i.test(entry.name))
+      .map((entry) => ({
+        title: entry.name.replace(/^\d+-/, '').replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ') || 'Untitled',
+        author: 'Local library',
+        resource_type: 'local',
+        format: 'pdf',
+        url: `/api/files/${encodeURIComponent(entry.name)}`
+      }));
+  } catch (err) {
+    console.warn('Could not read local book library:', err.message);
+    return [];
+  }
+}
+
+app.get('/api/cloudinary-books', async (req, res) => {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME || '';
+  const apiKey = process.env.CLOUDINARY_API_KEY || '';
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || '';
+
+  if (!cloudName || cloudName === 'your_cloud_name' || !apiKey || !apiSecret) {
+    console.warn('⚠️ Cloudinary not configured; returning empty library list.');
+    return res.json({ books: getLocalBooks(), warning: 'Cloudinary not configured' });
+  }
+
+  try {
+    let result = null;
+    const expressions = ['folder="book"', 'folder:"book"', 'resource_type:pdf AND folder:"book"', 'folder:"book" AND format:pdf'];
+    let lastErr = null;
+
+    for (const expression of expressions) {
+      try {
+        result = await cloudinary.v2.search
+          .expression(expression)
+          .max_results(100)
+          .execute();
+        if (result) break;
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+
+    if (!result) {
+      throw lastErr || new Error('Cloudinary search returned no result');
+    }
 
     const validBooks = (result.resources || []).filter(file => {
       const resourceType = file.resource_type || 'image';
@@ -357,10 +436,11 @@ app.get('/api/cloudinary-books', async (req, res) => {
       };
     });
 
-    res.json({ books });
+    res.json({ books: [...books, ...getLocalBooks()] });
   } catch (err) {
-    console.error('❌ Cloudinary books fetch error:', err.message);
-    res.status(500).json({ error: 'Failed to fetch books from Cloudinary', details: err.message });
+    const detail = err?.error?.message || err?.message || JSON.stringify(err || {});
+    console.error('❌ Cloudinary books fetch error:', detail);
+    res.status(200).json({ books: getLocalBooks(), warning: 'Cloudinary search unavailable', details: detail });
   }
 });
 

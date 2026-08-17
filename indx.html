@@ -21,6 +21,9 @@
       --spectrum-blue-400: #1473e6;
       --spectrum-blue-500: #0d66d0;
       --spectrum-blue-600: #095aae;
+      --annotation-highlight: #f1a487;
+      --annotation-highlight-hover: #ec9271;
+      --annotation-highlight-ink: #9d3528;
       --spectrum-icon-button-size: 40px;
       --spectrum-icon-size: 20px;
       --spectrum-sidebar-width: 60px;
@@ -42,6 +45,9 @@
       --spectrum-gray-600: #7a7a7a;
       --spectrum-gray-700: #b0a89c;
       --spectrum-gray-800: #e6e2dd;
+      --annotation-highlight: #9f4b3d;
+      --annotation-highlight-hover: #b75b49;
+      --annotation-highlight-ink: #ffd8cc;
     }
 
     /* ===== RESET & BASE ===== */
@@ -458,10 +464,42 @@
     body.dark .chapter-header { color: #ece7e1; }
     .chapter-meta { font-size: 14px; color: var(--spectrum-gray-700); margin-bottom: 30px; display: flex; gap: 16px; flex-wrap: wrap; }
     body.dark .chapter-meta { color: #b0a89c; }
+    .chapter-header,
+    .chapter-meta,
+    #chapterBtn,
+    #chapterModal {
+      display: none !important;
+    }
+
+    .page-block {
+      display: block;
+      background: rgba(255,255,255,0.32);
+      border: 1px solid rgba(120, 113, 109, 0.2);
+      border-radius: 16px;
+      padding: 22px 22px 8px;
+      margin: 0 0 22px;
+      box-shadow: 0 2px 10px rgba(30, 30, 30, 0.04);
+    }
+    body.dark .page-block {
+      background: rgba(34, 34, 34, 0.72);
+      border-color: rgba(181, 168, 156, 0.16);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+    }
+    .page-label {
+      display: inline-block;
+      margin: 0 0 12px;
+      font-size: 11px;
+      line-height: 1;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--spectrum-gray-600);
+      font-weight: 700;
+    }
+    body.dark .page-label { color: #8e857c; }
 
     /* ===== TEXT CONTENT ===== */
     .text-content,
-    .text-content * {
+    .text-content *:not(.highlighted-text):not(.translated-text) {
       all: revert;
       font-family: Georgia, 'Times New Roman', serif !important;
       font-size: 19px !important;
@@ -485,20 +523,91 @@
       max-width: 760px;
       margin: 0 auto;
     }
+    .text-content .highlighted-text,
+    .text-content .translated-text {
+      font-family: inherit !important;
+      font-size: inherit !important;
+      font-weight: inherit !important;
+      font-style: inherit !important;
+      line-height: inherit !important;
+      letter-spacing: inherit !important;
+      text-transform: inherit !important;
+      text-align: inherit !important;
+      color: inherit !important;
+      background: var(--annotation-highlight, #f1a487) !important;
+      box-shadow: inset 0 -2px 0 rgba(157, 53, 40, 0.35) !important;
+    }
     body.dark .text-content { color: #d6d0ca; }
     .text-content p {
       margin: 0 0 1.3em;
       position: relative;
       word-spacing: 0.02em;
+      padding-top: 0;
     }
-    .text-content p:first-child::first-letter {
-      font-size: 2.1em;
-      font-weight: 500;
-      float: left;
-      line-height: 0.9;
-      margin: 0.18em 0.18em 0 0;
+    .page-body {
+      padding-top: 0;
+      margin-top: 0;
+    }
+    .page-body > p,
+    .page-body > div,
+    .page-body > span {
+      margin-top: 0;
+      padding-top: 0;
+      line-height: 1.9;
     }
     .text-content p.pdf-empty { color: var(--spectrum-gray-700); font-style: italic; }
+
+    .highlighted-text {
+      --annotation-highlight: #f1a487;
+      --annotation-highlight-hover: #ec9271;
+      --annotation-highlight-ink: #9d3528;
+      background: var(--annotation-highlight);
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+      border-radius: var(--spectrum-corner-radius);
+      box-shadow: inset 0 -2px 0 rgba(157, 53, 40, 0.35);
+      color: inherit;
+      cursor: pointer;
+      padding: 0.04em 0.14em;
+      transition: background-color 150ms ease-in-out, box-shadow 150ms ease-in-out, border-radius 150ms ease-in-out, text-decoration-color 150ms ease-in-out;
+    }
+    .highlighted-text:hover {
+      background: var(--annotation-highlight-hover);
+      box-shadow: inset 0 -2px 0 var(--annotation-highlight-ink);
+    }
+    .highlighted-text:focus-visible {
+      outline: 2px solid var(--annotation-highlight-ink);
+      outline-offset: 2px;
+    }
+    .highlighted-text.highlight-shape-underline {
+      background: var(--annotation-highlight);
+      box-shadow: inset 0 -0.18em 0 rgba(157, 53, 40, 0.38);
+      border-radius: 0;
+      padding: 0.02em 0.08em;
+      text-decoration: underline 0.12em var(--annotation-highlight-ink);
+      text-decoration-skip-ink: none;
+      text-underline-offset: 0.14em;
+    }
+    .highlighted-text.highlight-shape-box {
+      background: var(--annotation-highlight);
+      padding: 0.04em 0.22em;
+      border-radius: 6px;
+      box-shadow: inset 0 0 0 1px rgba(157, 53, 40, 0.38), inset 0 -2px 0 rgba(157, 53, 40, 0.26);
+    }
+    .highlighted-text.highlight-shape-pill {
+      background: var(--annotation-highlight);
+      padding: 0.04em 0.28em;
+      border-radius: 999px;
+      box-shadow: inset 0 -2px 0 rgba(157, 53, 40, 0.24);
+    }
+    .highlighted-text.highlight-shape-strike {
+      background: linear-gradient(180deg, transparent 0 58%, rgba(241, 164, 135, 0.88) 58% 100%);
+      box-shadow: none;
+      border-radius: 0;
+      padding: 0 0.08em;
+      text-decoration: underline 0.16em var(--annotation-highlight-ink);
+      text-decoration-skip-ink: none;
+    }
 
     .text-content .sentence {
       transition: background 0.15s ease, color 0.15s ease;
@@ -625,6 +734,104 @@
       height: 18px;
       fill: currentColor;
     }
+    .highlight-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 176px;
+      padding: 10px 10px 8px;
+      border-radius: 10px;
+      background: var(--spectrum-gray-50);
+      border: var(--spectrum-border-width) solid var(--spectrum-gray-300);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+      z-index: 110;
+    }
+    body.dark .highlight-menu {
+      background: #2b2b2b;
+      border-color: #3f3f3f;
+    }
+    .highlight-menu.open {
+      display: flex;
+    }
+    .highlight-menu-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .highlight-menu-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--spectrum-gray-700);
+      font-weight: 700;
+      padding: 0 2px;
+    }
+    body.dark .highlight-menu-label { color: #b0a89c; }
+    .highlight-swatch-list,
+    .highlight-shape-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .highlight-swatch,
+    .highlight-shape {
+      border: 1px solid var(--spectrum-gray-300);
+      background: var(--spectrum-gray-50);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+    }
+    body.dark .highlight-swatch,
+    body.dark .highlight-shape {
+      background: #252525;
+      border-color: #4a4a4a;
+    }
+    .highlight-swatch:hover,
+    .highlight-shape:hover,
+    .highlight-swatch.active,
+    .highlight-shape.active {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 2px rgba(20, 115, 230, 0.18);
+      border-color: var(--spectrum-blue-400);
+    }
+    .highlight-swatch { box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08); }
+    .highlight-shape {
+      width: 28px;
+      height: 20px;
+      border-radius: 6px;
+      padding: 0;
+    }
+    .highlight-shape::before {
+      content: "";
+      display: block;
+      width: 16px;
+      height: 10px;
+      border-radius: 3px;
+      background: currentColor;
+      opacity: 0.85;
+    }
+    .highlight-shape[data-shape="underline"]::before {
+      border-radius: 0;
+      height: 3px;
+      width: 16px;
+      transform: translateY(3px);
+    }
+    .highlight-shape[data-shape="pill"]::before {
+      height: 10px;
+      border-radius: 999px;
+      width: 16px;
+    }
+    .highlight-shape[data-shape="strike"]::before {
+      height: 2px; border-radius: 999px; width: 16px; transform: translateY(1px); }
 
     /* ===== MODAL ===== */
     .modal-overlay {
@@ -1451,9 +1658,7 @@
     </div>
 
     <div class="reader-controls" id="readerControls">
-      <button class="control-btn" id="prevBtn">← Prev</button>
       <button class="control-btn" id="chapterBtn">Chapters</button>
-      <button class="control-btn" id="nextBtn">Next →</button>
     </div>
   </div>
 </div>
@@ -1511,9 +1716,30 @@
   <button id="readAloudBtn" title="Read Aloud">
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
   </button>
-  <button id="highlightBtn" title="Highlight">
+  <button id="highlightBtn" title="Apply highlight (Shift-click for style options)">
     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
   </button>
+  <div class="highlight-menu" id="highlightMenu" aria-label="Highlight options">
+    <div class="highlight-menu-row">
+      <span class="highlight-menu-label">Color</span>
+      <div class="highlight-swatch-list">
+        <button class="highlight-swatch active" type="button" data-color="#f1a487" data-hover="#ec9271" data-ink="#9d3528" style="background:#f1a487" title="Peach highlight"></button>
+        <button class="highlight-swatch" type="button" data-color="#f9d37b" data-hover="#f3c95d" data-ink="#7d5a1d" style="background:#f9d37b" title="Gold highlight"></button>
+        <button class="highlight-swatch" type="button" data-color="#a8d5ba" data-hover="#8fc3a4" data-ink="#2f5a4a" style="background:#a8d5ba" title="Mint highlight"></button>
+        <button class="highlight-swatch" type="button" data-color="#b4c8ff" data-hover="#9aacf6" data-ink="#2e3d7d" style="background:#b4c8ff" title="Blue highlight"></button>
+        <button class="highlight-swatch" type="button" data-color="#f0a4d2" data-hover="#e48dbf" data-ink="#7a2d5e" style="background:#f0a4d2" title="Pink highlight"></button>
+      </div>
+    </div>
+    <div class="highlight-menu-row">
+      <span class="highlight-menu-label">Shape</span>
+      <div class="highlight-shape-list">
+        <button class="highlight-shape active" type="button" data-shape="underline" title="Underline" style="color:#f1a487"></button>
+        <button class="highlight-shape" type="button" data-shape="box" title="Box" style="color:#f1a487"></button>
+        <button class="highlight-shape" type="button" data-shape="pill" title="Pill" style="color:#f1a487"></button>
+        <button class="highlight-shape" type="button" data-shape="strike" title="Strike" style="color:#f1a487"></button>
+      </div>
+    </div>
+  </div>
   <button id="noteBtn" title="Save Note">
     <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
   </button>
@@ -1554,6 +1780,13 @@
     <button id="searchExecuteBtn" style="padding:10px 20px;background:var(--spectrum-blue-400);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:500;">Search</button>
   </div>
   <div id="searchResults" style="color:var(--spectrum-gray-600);font-size:14px;">Results will appear here.</div>
+</div></div>
+
+<!-- Notes Modal -->
+<div class="modal-overlay" id="notesModal"><div class="modal" style="max-width: 480px; width: min(90vw, 480px);">
+  <button class="modal-close" onclick="closeNotesModal()">✕</button>
+  <h2 class="modal-title">Saved Notes</h2>
+  <div id="notesList" style="display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow:auto;padding-right:4px;"></div>
 </div></div>
 
 <!-- Mobile Menu Drawer -->
@@ -1644,10 +1877,33 @@ const chapters = [
   { num: 12, title: "On Crime and Punishment" }
 ];
 
+function detectChapterTitlesFromText(pages) {
+  if (!Array.isArray(chapters) || !chapters.length) return [];
+  return chapters.map((chapter, index) => ({
+    num: index + 1,
+    title: chapter && chapter.title ? chapter.title : `Section ${index + 1}`
+  }));
+}
+
+function syncChaptersFromBook() {
+  const pages = Array.isArray(fullText) ? fullText : [];
+  const detected = detectChapterTitlesFromText(pages);
+  if (detected.length) {
+    chapters.length = 0;
+    detected.forEach((chapter, index) => chapters.push({ ...chapter, num: index + 1 }));
+  }
+  if (chapters.length && chapterHeader) {
+    chapterHeader.textContent = chapters[Math.max(0, currentChapter - 1)]?.title || chapters[0].title;
+  }
+  return chapters;
+}
+
 let currentChapter = 2;
 let selectedText = '';
 let notes = [];
 let highlights = [];
+const NOTES_STORAGE_KEY = 'readerSavedNotes';
+const HIGHLIGHTS_STORAGE_KEY = 'readerSavedHighlights';
 let isNarrating = false;
 let highlightInterval = null;
 let sentenceElements = [];
@@ -1667,6 +1923,35 @@ const chapterMeta = $('chapterMeta');
 const landingPage = $('landingPage');
 const readerMode = $('readerMode');
 const readerControls = $('readerControls');
+
+function safeParseJson(value, fallback) {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function persistNotes() {
+  try {
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+  } catch (_) {}
+}
+
+function persistHighlights() {
+  try {
+    localStorage.setItem(HIGHLIGHTS_STORAGE_KEY, JSON.stringify(highlights));
+  } catch (_) {}
+}
+
+function hydrateStoredData() {
+  notes = safeParseJson(localStorage.getItem(NOTES_STORAGE_KEY), []);
+  highlights = safeParseJson(localStorage.getItem(HIGHLIGHTS_STORAGE_KEY), []);
+  if (!Array.isArray(notes)) notes = [];
+  if (!Array.isArray(highlights)) highlights = [];
+}
+
+hydrateStoredData();
 
 const pdfState = {
   doc: null,
@@ -1729,6 +2014,7 @@ function showMobileParagraphMenu(event, paragraphText) {
 
 function hideMobileParagraphMenu() {
   const menu = $('mobileParagraphMenu');
+  if (!menu) return;
   menu.classList.remove('active');
 }
 
@@ -1944,22 +2230,39 @@ function renderPages() {
   currentDisplayPage = pageIndex;
 
   container.innerHTML = '';
-  const paragraph = fullText[pageIndex - 1] || fullText[0] || '';
-  const p = document.createElement('p');
-  p.setAttribute('data-page', pageIndex);
-  p.className = 'page-block';
-  p.textContent = paragraph;
-  
-  // Add mobile paragraph click handler
-  if (isMobileDevice()) {
-    p.style.cursor = 'pointer';
-    p.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showMobileParagraphMenu(e, paragraph);
-    });
-  }
-  
-  container.appendChild(p);
+  const pageCount = fullText.length || 1;
+  const pageEntries = Array.from({ length: pageCount }, (_, i) => fullText[i] || '').filter(Boolean);
+
+  pageEntries.forEach((paragraph, index) => {
+    const pageBlock = document.createElement('section');
+    pageBlock.className = 'page-block';
+    pageBlock.setAttribute('data-page', index + 1);
+
+    const pageLabel = document.createElement('div');
+    pageLabel.className = 'page-label';
+    pageLabel.textContent = `Page ${index + 1}`;
+
+    const content = document.createElement('div');
+    content.className = 'page-body';
+    content.innerHTML = renderHighlightedText(paragraph, highlights);
+
+    const p = document.createElement('p');
+    p.textContent = paragraph;
+    p.style.display = 'none';
+    content.appendChild(p);
+
+    if (isMobileDevice()) {
+      content.style.cursor = 'pointer';
+      content.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showMobileParagraphMenu(e, paragraph);
+      });
+    }
+
+    pageBlock.appendChild(pageLabel);
+    pageBlock.appendChild(content);
+    container.appendChild(pageBlock);
+  });
 
   sentenceElements = Array.from(container.querySelectorAll('.sentence'));
   updatePageIndicator();
@@ -2210,10 +2513,16 @@ function renderPdfPage(pageNumber) {
   const pdfTitle = pdfState.title || 'Uploaded PDF';
 
   textContent.innerHTML = pageHtml;
+  const paragraphs = textContent.querySelectorAll('p');
+  paragraphs.forEach((p) => {
+    const plainText = p.textContent || '';
+    if (plainText.trim()) {
+      p.innerHTML = renderHighlightedText(plainText, highlights);
+    }
+  });
 
   // Add mobile paragraph click listeners for PDF
   if (isMobileDevice()) {
-    const paragraphs = textContent.querySelectorAll('p');
     paragraphs.forEach(p => {
       p.style.cursor = 'pointer';
       p.addEventListener('click', (e) => {
@@ -2381,6 +2690,40 @@ function updateStats() {
   if (noteCountEl) {
     noteCountEl.textContent = notes.length;
   }
+
+  const bookmarkBadge = document.querySelector('#bookmarksBtn .badge');
+  if (bookmarkBadge) {
+    bookmarkBadge.textContent = String(notes.length);
+  }
+}
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function renderHighlightedText(sourceText, sourceHighlights = highlights) {
+  if (!sourceText) return '';
+  let html = escapeHtml(sourceText);
+  const items = (sourceHighlights || [])
+    .filter(item => item && typeof item.text === 'string' && item.text.trim())
+    .filter(item => sourceText.includes(item.text))
+    .sort((a, b) => String(b.text).length - String(a.text).length);
+
+  for (const item of items) {
+    const text = String(item.text).trim();
+    if (!text) continue;
+    const needle = escapeHtml(text);
+    const regex = new RegExp(escapeRegex(needle), 'gi');
+    html = html.replace(regex, (match) => {
+      const color = item.color || '#f1a487';
+      const hover = item.hover || '#ec9271';
+      const ink = item.ink || '#9d3528';
+      const shape = item.shape || 'underline';
+      return `<span class="highlighted-text highlight-shape-${shape}" style="--annotation-highlight:${color};--annotation-highlight-hover:${hover};--annotation-highlight-ink:${ink};">${match}</span>`;
+    });
+  }
+
+  return html;
 }
 
 function initSpine() {
@@ -2475,7 +2818,7 @@ function showCloudinaryRefreshNotice(book, errorMessage = '') {
 async function loadGutendexBooks(searchQuery = '') {
   try {
     showToast('☁️ Loading books from Cloudinary...', 'info');
-    const res = await fetch(`/api/cloudinary-books`);
+    const res = await fetch('/api/cloudinary-books', { cache: 'no-store' });
     
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     
@@ -2599,6 +2942,7 @@ async function loadBookContent(book) {
     fullText.length = 0;
     newPages.forEach(p => fullText.push(p));
     currentChapter = 1;
+    syncChaptersFromBook();
 
     renderPages();
     initSpine();
@@ -2666,6 +3010,7 @@ async function loadCloudinaryBook(book) {
     currentChapter = 1;
     fullText.length = 0;
     pdfState.pageText.forEach(text => fullText.push(text));
+    syncChaptersFromBook();
 
     renderPages();
     initSpine();
@@ -2688,50 +3033,52 @@ function closeLibraryModal() { $('libraryModal').classList.remove('active'); }
 function openSearchModal() { $('searchModal').classList.add('active'); }
 function closeSearchModal() { $('searchModal').classList.remove('active'); }
 
+function renderNotesList() {
+  const notesList = $('notesList');
+  if (!notesList) return;
+
+  if (!notes.length) {
+    notesList.innerHTML = '<div style="padding:16px; border:1px solid #e5e7eb; border-radius:12px; color:#6b7280; background:#f9fafb;">No saved notes yet. Select text and save a note to see it here.</div>';
+    return;
+  }
+
+  notesList.innerHTML = notes.map((entry, idx) => `
+    <div style="border:1px solid #e5e7eb; border-radius:12px; background:#f9fafb; padding:12px 14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+        <div style="font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#6b7280;">Note ${idx + 1}</div>
+        <button type="button" onclick="deleteNote(${idx})" style="padding:5px 10px; border:none; border-radius:8px; background:#fee2e2; color:#991b1b; font-weight:600; cursor:pointer;">Delete</button>
+      </div>
+      <div style="font-size:13px; font-weight:600; color:#1f2937; margin-bottom:8px;">${escapeHtml(entry.text || 'Selected text')}</div>
+      <div style="font-size:14px; line-height:1.55; color:#374151; white-space:pre-wrap;">${escapeHtml(entry.note || '')}</div>
+    </div>
+  `).join('');
+}
+
+function deleteNote(index) {
+  notes.splice(index, 1);
+  persistNotes();
+  updateStats();
+  renderNotesList();
+  showToast('Note deleted', 'info', 1500);
+}
+
+function openNotesModal() {
+  renderNotesList();
+  const notesModal = $('notesModal');
+  if (notesModal) notesModal.classList.add('active');
+}
+
+function closeNotesModal() {
+  const notesModal = $('notesModal');
+  if (notesModal) notesModal.classList.remove('active');
+}
+
 // ===== DARK MODE =====
 $('darkModeToggle').addEventListener('click', () => {
   document.body.classList.toggle('dark');
 });
 
 // ===== NAV BUTTONS =====
-$('prevBtn').addEventListener('click', async () => {
-  if (isNarrating) { showToast('Narration in progress...', 'info'); return; }
-
-  if (pdfState.doc) {
-    if (pdfState.currentPage > 1) {
-      await loadPdfPage(pdfState.currentPage - 1);
-    }
-    return;
-  }
-
-  if (currentDisplayPage > 1) {
-    currentDisplayPage -= 1;
-    renderPages();
-    return;
-  }
-
-  if (currentChapter > 1) goToChapter(currentChapter - 1);
-});
-
-$('nextBtn').addEventListener('click', async () => {
-  if (isNarrating) { showToast('Narration in progress...', 'info'); return; }
-
-  if (pdfState.doc) {
-    if (pdfState.currentPage < pdfState.totalPages) {
-      await loadPdfPage(pdfState.currentPage + 1);
-    }
-    return;
-  }
-
-  if (currentDisplayPage < (fullText.length || 1)) {
-    currentDisplayPage += 1;
-    renderPages();
-    return;
-  }
-
-  if (currentChapter < chapters.length) goToChapter(currentChapter + 1);
-});
-
 $('chapterBtn').addEventListener('click', openChapterModal);
 
 // ===== SIDEBAR BUTTONS =====
@@ -2763,7 +3110,11 @@ $('searchInput').addEventListener('keypress', (e) => {
 $('searchExecuteBtn').addEventListener('click', executeAdvancedSearch);
 
 $('bookmarksBtn').addEventListener('click', () => {
-  showToast(`${notes.length} bookmarks saved`, 'info', 2000);
+  if (!notes.length) {
+    showToast('No saved notes yet', 'info', 2000);
+    return;
+  }
+  openNotesModal();
 });
 
 // ===== TIMER MODAL =====
@@ -2808,7 +3159,7 @@ async function speakNarration(text, callback) {
   if (!text || !text.trim()) { if (callback) callback(); return; }
 
   try {
-    const response = await fetch('/api/elevenlabs', {
+    const response = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text.trim() })
@@ -2874,7 +3225,7 @@ Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply imme
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: 'qwen/qwen3.6-27b',
         messages: [
           { role: 'system', content: systemMsg },
           { role: 'user', content: prompt }
@@ -2938,30 +3289,243 @@ $('aiReadPageBtn').addEventListener('click', async () => {
   await callAI(pageText, 'readpage');
 });
 
+let activeSelectionRange = null;
+let pendingHighlightRange = null;
+
+function captureSelectionRange() {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) {
+    activeSelectionRange = null;
+    pendingHighlightRange = null;
+    return null;
+  }
+
+  const range = sel.getRangeAt(0);
+  if (!range || !range.toString().trim()) {
+    activeSelectionRange = null;
+    pendingHighlightRange = null;
+    return null;
+  }
+
+  if (textContent && !textContent.contains(range.commonAncestorContainer)) {
+    activeSelectionRange = null;
+    pendingHighlightRange = null;
+    return null;
+  }
+
+  activeSelectionRange = range.cloneRange();
+  pendingHighlightRange = activeSelectionRange.cloneRange();
+  selectedText = range.toString().trim();
+  return activeSelectionRange;
+}
+
 // ===== SELECTION =====
 document.addEventListener('mouseup', (e) => {
   const sel = window.getSelection();
-  const txt = sel.toString().trim();
+  const txt = sel ? sel.toString().trim() : '';
   const toolbar = $('selectionToolbar');
-  
-  if (txt && textContent.contains(sel.anchorNode) && textContent.contains(sel.focusNode)) {
+  const menu = $('highlightMenu');
+
+  if (!toolbar || !menu) return;
+  if (toolbar.contains(e.target) || menu.contains(e.target)) {
+    return;
+  }
+
+  if (txt && textContent && textContent.contains(sel.anchorNode) && textContent.contains(sel.focusNode) && sel.rangeCount) {
     selectedText = txt;
+    activeSelectionRange = sel.getRangeAt(0).cloneRange();
+    pendingHighlightRange = activeSelectionRange.cloneRange();
     const rect = sel.getRangeAt(0).getBoundingClientRect();
     toolbar.style.display = 'flex';
     toolbar.style.left = Math.max(16, rect.left + rect.width / 2 - toolbar.offsetWidth / 2) + 'px';
     toolbar.style.top = Math.max(16, rect.top - 56 + window.scrollY) + 'px';
   } else {
+    selectedText = '';
+    activeSelectionRange = null;
+    pendingHighlightRange = null;
     toolbar.style.display = 'none';
+    menu.classList.remove('open');
   }
 });
 
-document.addEventListener('scroll', () => { $('selectionToolbar').style.display = 'none'; });
+document.addEventListener('scroll', () => {
+  const toolbar = $('selectionToolbar');
+  if (toolbar) toolbar.style.display = 'none';
+});
 document.addEventListener('mousedown', (e) => {
   const toolbar = $('selectionToolbar');
-  if (!toolbar.contains(e.target)) toolbar.style.display = 'none';
+  const menu = $('highlightMenu');
+  if (!toolbar || !menu) return;
+  if (toolbar.contains(e.target) || menu.contains(e.target)) return;
+  toolbar.style.display = 'none';
+  menu.classList.remove('open');
 });
 
+var highlightMenu = $('highlightMenu');
+
+// Keep the text selection intact while an action is chosen from its toolbar.
+const selectionToolbar = $('selectionToolbar');
+if (selectionToolbar) {
+  selectionToolbar.addEventListener('mousedown', (e) => e.preventDefault());
+}
+if (highlightMenu) {
+  highlightMenu.addEventListener('mousedown', (e) => e.preventDefault());
+}
+
 // ===== TOOLBAR ACTIONS =====
+var activeHighlightStyle = {
+  color: '#f1a487',
+  hover: '#ec9271',
+  ink: '#9d3528',
+  shape: 'underline'
+};
+
+const highlightSwatches = [...document.querySelectorAll('.highlight-swatch')];
+const highlightShapes = [...document.querySelectorAll('.highlight-shape')];
+
+function setActiveHighlightPreset(color, hover, ink, shape) {
+  activeHighlightStyle = { color, hover, ink, shape };
+
+  highlightSwatches.forEach((swatch) => {
+    const isActive = swatch.dataset.color === color;
+    swatch.classList.toggle('active', isActive);
+  });
+
+  highlightShapes.forEach((shapeBtn) => {
+    const isActive = shapeBtn.dataset.shape === shape;
+    shapeBtn.classList.toggle('active', isActive);
+  });
+}
+
+highlightSwatches.forEach((swatch) => {
+  swatch.addEventListener('click', () => {
+    setActiveHighlightPreset(
+      swatch.dataset.color,
+      swatch.dataset.hover,
+      swatch.dataset.ink,
+      activeHighlightStyle.shape
+    );
+  });
+});
+
+highlightShapes.forEach((shapeBtn) => {
+  shapeBtn.addEventListener('click', () => {
+    setActiveHighlightPreset(
+      activeHighlightStyle.color,
+      activeHighlightStyle.hover,
+      activeHighlightStyle.ink,
+      shapeBtn.dataset.shape
+    );
+  });
+});
+
+function applyHighlightSelection(rangeOverride = null) {
+  const sel = window.getSelection();
+  const range = rangeOverride
+    ? rangeOverride.cloneRange()
+    : pendingHighlightRange
+      ? pendingHighlightRange.cloneRange()
+      : activeSelectionRange
+        ? activeSelectionRange.cloneRange()
+        : (sel && sel.rangeCount ? sel.getRangeAt(0).cloneRange() : null);
+
+  if (!range || !range.toString().trim()) {
+    return showToast('Select text', 'error');
+  }
+
+  try {
+    if (!textContent.contains(range.commonAncestorContainer)) {
+      throw new Error('Selection is outside the page text');
+    }
+
+    const selectedTextValue = range.toString().trim();
+    highlights.push({
+      text: selectedTextValue,
+      color: activeHighlightStyle.color,
+      hover: activeHighlightStyle.hover,
+      ink: activeHighlightStyle.ink,
+      shape: activeHighlightStyle.shape
+    });
+    persistHighlights();
+
+    const wrapper = document.createElement('span');
+    wrapper.className = `highlighted-text highlight-shape-${activeHighlightStyle.shape}`;
+    wrapper.style.setProperty('--annotation-highlight', activeHighlightStyle.color);
+    wrapper.style.setProperty('--annotation-highlight-hover', activeHighlightStyle.hover);
+    wrapper.style.setProperty('--annotation-highlight-ink', activeHighlightStyle.ink);
+
+    const shapeStyles = {
+      underline: {
+        background: activeHighlightStyle.color,
+        boxShadow: `inset 0 -0.18em 0 ${activeHighlightStyle.ink}55`,
+        borderRadius: '0',
+        padding: '0.02em 0.08em',
+        textDecoration: `underline 0.12em ${activeHighlightStyle.ink}`,
+        textDecorationSkipInk: 'none',
+        textUnderlineOffset: '0.14em'
+      },
+      box: {
+        background: activeHighlightStyle.color,
+        boxShadow: `inset 0 0 0 1px ${activeHighlightStyle.ink}66, inset 0 -2px 0 ${activeHighlightStyle.ink}44`,
+        borderRadius: '6px',
+        padding: '0.04em 0.22em'
+      },
+      pill: {
+        background: activeHighlightStyle.color,
+        boxShadow: `inset 0 -2px 0 ${activeHighlightStyle.ink}44`,
+        borderRadius: '999px',
+        padding: '0.04em 0.28em'
+      },
+      strike: {
+        background: `linear-gradient(180deg, transparent 0 58%, ${activeHighlightStyle.color} 58% 100%)`,
+        boxShadow: 'none',
+        borderRadius: '0',
+        padding: '0 0.08em',
+        textDecoration: `underline 0.16em ${activeHighlightStyle.ink}`,
+        textDecorationSkipInk: 'none'
+      }
+    };
+
+    Object.assign(wrapper.style, shapeStyles[activeHighlightStyle.shape] || shapeStyles.underline);
+    wrapper.tabIndex = 0;
+    wrapper.title = 'Remove highlight';
+    wrapper.onclick = function (e) {
+      e.stopPropagation();
+      if (confirm('Remove highlight?')) {
+        const parent = this.parentNode;
+        parent.replaceChild(document.createTextNode(this.textContent), this);
+        parent.normalize();
+      }
+    };
+    wrapper.onkeydown = function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    };
+
+    try {
+      range.surroundContents(wrapper);
+    } catch (err) {
+      const fragment = range.extractContents();
+      wrapper.appendChild(fragment);
+      range.insertNode(wrapper);
+    }
+
+    pendingHighlightRange = null;
+    if (sel && sel.rangeCount) sel.removeAllRanges();
+    activeSelectionRange = null;
+    selectedText = '';
+    showToast('Highlighted', 'success');
+  } catch (e) {
+    console.error('Could not apply highlight:', e);
+    showToast('Could not highlight selection', 'error');
+  }
+
+  highlightMenu.classList.remove('open');
+  $('selectionToolbar').style.display = 'none';
+}
+
 $('readAloudBtn').addEventListener('click', async () => {
   const t = selectedText || getPageContext();
   if (!t) return showToast('Select text first', 'error');
@@ -2971,40 +3535,75 @@ $('readAloudBtn').addEventListener('click', async () => {
 });
 
 $('highlightBtn').addEventListener('click', () => {
-  const sel = window.getSelection();
-  if (!sel.rangeCount || !sel.toString().trim()) return showToast('Select text', 'error');
-  try {
-    const range = sel.getRangeAt(0);
-    const span = document.createElement('span');
-    span.className = 'highlighted-text';
-    span.style.background = '#fff4b8';
-    span.style.padding = '2px 4px';
-    span.style.cursor = 'pointer';
-    span.onclick = function (e) {
-      e.stopPropagation();
-      if (confirm('Remove highlight?')) {
-        const parent = this.parentNode;
-        parent.replaceChild(document.createTextNode(this.textContent), this);
-        parent.normalize();
-      }
-    };
-    range.surroundContents(span);
-    sel.removeAllRanges();
-    showToast('Highlighted', 'success');
-  } catch (e) {
-    showToast('Try smaller selection', 'error');
+  if (!activeSelectionRange || !activeSelectionRange.toString().trim()) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount && sel.toString().trim()) {
+      activeSelectionRange = sel.getRangeAt(0).cloneRange();
+      pendingHighlightRange = activeSelectionRange.cloneRange();
+      selectedText = activeSelectionRange.toString().trim();
+    } else {
+      return showToast('Select text', 'error');
+    }
+  } else {
+    pendingHighlightRange = activeSelectionRange.cloneRange();
   }
-  $('selectionToolbar').style.display = 'none';
+
+  const toolbar = $('selectionToolbar');
+  if (highlightMenu.classList.contains('open')) {
+    highlightMenu.classList.remove('open');
+    toolbar.style.display = 'none';
+    return;
+  }
+
+  highlightMenu.classList.add('open');
+  highlightMenu.style.left = '0px';
+  highlightMenu.style.top = '44px';
+  toolbar.style.display = 'flex';
+});
+
+highlightMenu.addEventListener('click', (event) => {
+  const swatch = event.target.closest('.highlight-swatch');
+  const shape = event.target.closest('.highlight-shape');
+
+  if (swatch) {
+    setActiveHighlightPreset(
+      swatch.dataset.color,
+      swatch.dataset.hover,
+      swatch.dataset.ink,
+      activeHighlightStyle.shape
+    );
+    return;
+  }
+
+  if (shape) {
+    const currentRange = pendingHighlightRange ? pendingHighlightRange.cloneRange() : captureSelectionRange();
+    setActiveHighlightPreset(
+      activeHighlightStyle.color,
+      activeHighlightStyle.hover,
+      activeHighlightStyle.ink,
+      shape.dataset.shape
+    );
+    if (currentRange && currentRange.toString().trim()) {
+      pendingHighlightRange = currentRange.cloneRange();
+      applyHighlightSelection(pendingHighlightRange);
+      return;
+    }
+
+    applyHighlightSelection();
+  }
 });
 
 $('noteBtn').addEventListener('click', () => {
-  const t = window.getSelection().toString().trim();
+  const selectionText = (window.getSelection && window.getSelection().toString().trim()) || selectedText || '';
+  const t = selectionText.trim();
   if (!t) return showToast('Select text', 'error');
-  $('selectionToolbar').style.display = 'none';
+  const toolbar = $('selectionToolbar');
+  if (toolbar) toolbar.style.display = 'none';
   
   const modal = document.createElement('div');
+  modal.className = 'note-modal';
   modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.15);border:1px solid #ccc;width:300px;';
-  modal.innerHTML = '<label style="display:block;margin-bottom:10px;font-weight:500;">Add note for this text:</label><textarea id="noteInput" style="width:100%;height:80px;padding:8px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:14px;resize:vertical;" placeholder="Write your note here..."></textarea><div style="display:flex;gap:10px;margin-top:12px;"><button onclick="saveNote()" style="flex:1;padding:8px;background:#6b7e5e;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500;">Save</button><button onclick="this.parentElement.parentElement.remove()" style="flex:1;padding:8px;background:#ccc;border:none;border-radius:4px;cursor:pointer;">Cancel</button></div>';
+  modal.innerHTML = '<div><label style="display:block;margin-bottom:10px;font-weight:500;">Add note for this text:</label><textarea id="noteInput" style="width:100%;height:80px;padding:8px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:14px;resize:vertical;" placeholder="Write your note here..."></textarea><div style="display:flex;gap:10px;margin-top:12px;"><button type="button" onclick="saveNote(this.closest(\'.note-modal\'))" style="flex:1;padding:8px;background:#6b7e5e;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500;">Save</button><button type="button" onclick="this.closest(\'.note-modal\').remove()" style="flex:1;padding:8px;background:#ccc;border:none;border-radius:4px;cursor:pointer;">Cancel</button></div></div>';
   window.currentNoteText = t;
   document.body.appendChild(modal);
   setTimeout(() => { const ta = document.getElementById('noteInput'); if (ta) ta.focus(); }, 100);
@@ -3080,13 +3679,27 @@ function performTranslateWithSelect() {
   performTranslate(selectedText, lang);
 }
 
-function saveNote() {
+function saveNote(modal = null) {
   const textarea = document.getElementById('noteInput');
+  if (!textarea) {
+    showToast('Note editor is missing', 'error');
+    return;
+  }
+
   const noteText = textarea.value.trim();
   if (!noteText) { showToast('Enter a note', 'error'); return; }
-  notes.push({ text: window.currentNoteText, note: noteText });
+
+  const savedText = (window.currentNoteText || selectedText || '').trim();
+  notes.push({ text: savedText || 'Selected text', note: noteText });
+  persistNotes();
   updateStats();
-  textarea.parentElement.parentElement.remove();
+  renderNotesList();
+
+  const noteModal = modal || textarea.closest('.note-modal');
+  if (noteModal) {
+    noteModal.remove();
+  }
+
   showToast('Note saved', 'success');
 }
 
@@ -3099,8 +3712,6 @@ document.addEventListener('keydown', (e) => {
     if (highlightInterval) clearInterval(highlightInterval);
     if (window.__resetTimerModal) window.__resetTimerModal();
   }
-  if (e.ctrlKey && e.key === 'ArrowLeft') { e.preventDefault(); $('prevBtn').click(); }
-  if (e.ctrlKey && e.key === 'ArrowRight') { e.preventDefault(); $('nextBtn').click(); }
   if (e.ctrlKey && e.key === 'r') { e.preventDefault(); $('aiReadPageBtn').click(); }
   if (e.ctrlKey && e.key === 't') { 
     e.preventDefault(); 
@@ -3269,6 +3880,34 @@ function initTimerModal() {
     translatedTopicPool = await translateTopics(topicPool, topicLanguage);
   }
 
+  function parseGroqJsonArray(rawText, fallback = []) {
+    const cleaned = String(rawText || '')
+      .replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '')
+      .replace(/<\s*\/\s*think\s*>/gi, '')
+      .replace(/```json|```/gi, '')
+      .trim();
+
+    if (!cleaned) return fallback;
+
+    const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
+    const objectMatch = cleaned.match(/\{[\s\S]*\}/);
+    const candidate = arrayMatch ? arrayMatch[0] : objectMatch ? objectMatch[0] : cleaned;
+
+    try {
+      const parsed = JSON.parse(candidate);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(item => typeof item === 'string' && item.trim()).map(item => item.trim()).slice(0, 10);
+      }
+      if (parsed && Array.isArray(parsed.topics)) {
+        return parsed.topics.filter(item => typeof item === 'string' && item.trim()).map(item => item.trim()).slice(0, 10);
+      }
+    } catch (_) {
+      // Ignore parse errors and fall back to a safe default below.
+    }
+
+    return fallback;
+  }
+
   async function generateTopicsFromPdf() {
     let sourceText = '';
 
@@ -3307,7 +3946,7 @@ ${sourceText.slice(0, 12000)}`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'qwen/qwen3.6-27b',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.8,
           max_tokens: 500
@@ -3320,24 +3959,22 @@ ${sourceText.slice(0, 12000)}`;
         return buildFallbackTopics();
       }
 
-      const data = await response.json();
-      const raw = data.choices?.[0]?.message?.content || '[]';
-      const cleaned = raw.replace(/```json|```/gi, '').trim();
-      const jsonStart = cleaned.indexOf('[');
-      const jsonEnd = cleaned.lastIndexOf(']');
-      const jsonText = jsonStart >= 0 && jsonEnd > jsonStart ? cleaned.slice(jsonStart, jsonEnd + 1) : cleaned;
-      const parsed = JSON.parse(jsonText);
-
-      if (!Array.isArray(parsed)) {
-        return [];
+      const contentType = (response.headers.get('content-type') || '').toLowerCase();
+      const responseText = await response.text();
+      if (!contentType.includes('application/json')) {
+        return parseGroqJsonArray(responseText, buildFallbackTopics());
       }
 
-      const topics = parsed
-        .filter(item => typeof item === 'string' && item.trim())
-        .map(item => item.trim())
-        .slice(0, 10);
-
-      return topics;
+      try {
+        const data = JSON.parse(responseText);
+        const raw = data.choices?.[0]?.message?.content || '[]';
+        const parsed = parseGroqJsonArray(raw, []);
+        if (parsed.length) return parsed;
+        return buildFallbackTopics();
+      } catch (err) {
+        console.error('Topic generation failed:', err);
+        return parseGroqJsonArray(responseText, buildFallbackTopics());
+      }
     } catch (err) {
       console.error('Topic generation failed:', err);
       return buildFallbackTopics();
