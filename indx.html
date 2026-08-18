@@ -962,8 +962,7 @@ body.dark .library-count { background: none; color: var(--text-muted); }
 .gutendex-book .book-index { position: absolute; top: 18px; right: 18px; color: var(--text-muted); font: 500 12px 'EB Garamond', serif; }
 .gutendex-book .book-mark { position: absolute; top: 0; left: 25px; width: 19px; height: 33px; background: var(--accent-light); opacity: .85; }
 .gutendex-book .book-mark::after { content: ''; position: absolute; bottom: -1px; width: 0; height: 0; border-left: 9.5px solid transparent; border-right: 9.5px solid transparent; border-bottom: 8px solid var(--cream-bg); }
-.gutendex-book .title { display: block; position: relative; margin: 0 0 8px; font: 500 clamp(1.35rem, 2vw, 1.7rem)/1.02 'EB Garamond', serif; letter-spacing: -.025em; }
-.gutendex-book .meta { display: block; position: relative; color: var(--text-secondary); font-size: 12px; font-weight: 600; line-height: 1.45; }
+.gutendex-book .title { display: block; position: relative; margin: 0 0 8px; font: 500 clamp(1rem, 1.35vw, 1.2rem)/1.12 'EB Garamond', serif; letter-spacing: 0; overflow-wrap: anywhere; word-break: break-word; }
 .gutendex-book .action { display: block; position: relative; margin-top: 20px; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .gutendex-book .action::after { content: ' →'; }
 .library-empty, .library-status { grid-column: 1 / -1; padding: 64px 20px; color: var(--text-muted); text-align: center; font: 500 17px 'EB Garamond', serif; }
@@ -982,7 +981,7 @@ body.dark .gutendex-book .book-mark::after { border-bottom-color: var(--cream-bg
   .library-toolbar button { padding: 0 14px; }
   .library-books { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 22px 24px 40px; }
   .gutendex-book { min-height: 210px; padding: 18px 16px 15px; }
-  .gutendex-book .title { font-size: 1.3rem; }
+  .gutendex-book .title { font-size: 1.05rem; }
   .gutendex-book .book-index { top: 14px; right: 14px; }
   .library-modal .modal-close { top: 20px; right: 16px; }
 }
@@ -1020,27 +1019,64 @@ body.dark .timer-modal .modal { box-shadow: 0 24px 70px rgba(0,0,0,.45); }
 
 /* ===== TOAST ===== */
 .toast {
-  position: fixed; bottom: 100px; left: 50%;
+  --alert-accent: var(--accent);
+  --alert-surface: var(--cream-light);
+  --alert-ink: var(--text-primary);
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  width: min(92vw, 440px);
   transform: translateX(-50%) translateY(20px);
-  background: #2a2a2a; color: white;
-  padding: 10px 24px; font-size: 14px;
+  background: var(--alert-surface);
+  color: var(--alert-ink);
+  padding: 14px 16px;
   z-index: 2000;
   opacity: 0; transition: opacity 0.3s, transform 0.3s;
   pointer-events: none;
-  border-radius: 30px;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--alert-accent);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+  font: 600 13px/1.4 'Inter', sans-serif;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
-body.dark .toast { background: #3a3a3a; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.success { background: #2d5a2d; }
-.toast.error { background: #6b2a2a; }
-.toast.info { background: #2a3a5a; }
-.toast svg {
+.toast.success { --alert-accent: #7fbe87; --alert-surface: #20352a; --alert-ink: #e4f5e5; }
+.toast.error { --alert-accent: #e58b7c; --alert-surface: #3a2525; --alert-ink: #ffe8e3; }
+.toast.info { --alert-accent: #8bb7d8; --alert-surface: #24313d; --alert-ink: #e6f1fa; }
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--alert-accent) 55%, transparent);
+  color: var(--alert-accent);
+}
+.toast-icon svg {
   width: 16px;
   height: 16px;
   fill: currentColor;
+}
+.toast-message { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.toast-close {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--alert-ink);
+  cursor: pointer;
+  opacity: .7;
+}
+.toast-close:hover { border-color: var(--alert-accent); opacity: 1; }
+.toast-close svg { width: 14px; height: 14px; fill: currentColor; }
+@media (max-width: 480px) {
+  .toast { bottom: 92px; padding: 12px; }
 }
 
 .hidden { display: none !important; }
@@ -1386,7 +1422,7 @@ body.dark .mobile-paragraph-menu-divider {
 }
   </style>
 </head>
-<body>
+<body class="dark">
 <div class="container">
   <!-- ===== LEFT SIDEBAR ===== -->
   <div class="sidebar-left">
@@ -1509,7 +1545,6 @@ body.dark .mobile-paragraph-menu-divider {
           <h1 id="mainHeading">AI is choosing a topic...</h1>
         </div>
 
-        <p class="supporting" id="supportingText">AI is choosing a topic...</p>
 
         <div class="timer-language">
           <label for="topicLanguageSelect">Language</label>
@@ -1575,7 +1610,7 @@ body.dark .mobile-paragraph-menu-divider {
 
 <!-- Chapter Modal -->
 <div class="modal-overlay" id="chapterModal"><div class="modal">
-  <button class="modal-close" onclick="closeChapterModal()">✕</button>
+  <button class="modal-close" onclick="closeChapterModal()">X</button>
   <h2 class="modal-title" id="chapterModalTitle">Chapters</h2>
   <ul class="modal-list" id="chapterList"></ul>
 </div></div>
@@ -1583,9 +1618,9 @@ body.dark .mobile-paragraph-menu-divider {
 <!-- ===== LIBRARY MODAL ===== -->
 <div class="modal-overlay library-modal" id="libraryModal">
   <div class="modal">
-    <button class="modal-close" onclick="closeLibraryModal()">✕</button>
+    <button class="modal-close" onclick="closeLibraryModal()">X</button>
     <div class="library-header">
-      <h2 class="modal-title">📚 Library</h2>
+      <h2 class="modal-title">Library</h2>
       <span id="libraryCount" class="library-count">0 books</span>
     </div>
     <div class="library-toolbar">
@@ -1593,14 +1628,14 @@ body.dark .mobile-paragraph-menu-divider {
       <button id="librarySearchBtn">Search</button>
     </div>
     <div id="libraryBooks" class="library-books">
-      <div style="color:var(--spectrum-gray-600);font-size:14px;padding:20px;text-align:center;grid-column:1/-1;">☁️ Loading books...</div>
+      <div style="color:var(--spectrum-gray-600);font-size:14px;padding:20px;text-align:center;grid-column:1/-1;">Loading books...</div>
     </div>
   </div>
 </div>
 
 <!-- Search Modal -->
 <div class="modal-overlay" id="searchModal"><div class="modal">
-  <button class="modal-close" onclick="closeSearchModal()">✕</button>
+  <button class="modal-close" onclick="closeSearchModal()">X</button>
   <h2 class="modal-title">Advanced Search</h2>
   <div style="display:flex;gap:10px;margin-bottom:16px;">
     <input type="text" id="searchInput" placeholder="Search this page or document..." style="flex:1;padding:10px 14px;border:1px solid var(--spectrum-gray-300);border-radius:6px;font-family:inherit;font-size:14px;background:var(--spectrum-gray-50);color:var(--spectrum-gray-800);">
@@ -1611,7 +1646,7 @@ body.dark .mobile-paragraph-menu-divider {
 
 <!-- Notes Modal -->
 <div class="modal-overlay" id="notesModal"><div class="modal" style="max-width: 480px; width: min(90vw, 480px);">
-  <button class="modal-close" onclick="closeNotesModal()">✕</button>
+  <button class="modal-close" onclick="closeNotesModal()">X</button>
   <h2 class="modal-title">Saved Notes</h2>
   <div id="notesList" style="display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow:auto;padding-right:4px;"></div>
 </div></div>
@@ -1804,11 +1839,22 @@ function showToast(msg, type = 'info', dur = 3000) {
     error: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>',
     info: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>'
   };
-  toast.innerHTML = (iconMap[type] || '') + ' ' + msg;
-  toast.className = `toast ${type}`;
+  const normalizedType = iconMap[type] ? type : 'info';
+  toast.innerHTML = `
+    <span class="toast-icon" aria-hidden="true">${iconMap[normalizedType]}</span>
+    <span class="toast-message">${escapeHtml(msg)}</span>
+    <button class="toast-close" type="button" aria-label="Dismiss alert">
+      <svg viewBox="0 0 24 24"><path d="M18.3 5.71 16.89 4.29 12 9.17 7.11 4.29 5.7 5.71 10.59 10.59 5.7 15.48 7.11 16.89 12 12 16.89 16.89 18.3 15.48 13.41 10.59z"/></svg>
+    </button>
+  `;
+  toast.className = `toast ${normalizedType}`;
+  toast.setAttribute('role', normalizedType === 'error' ? 'alert' : 'status');
+  toast.setAttribute('aria-live', normalizedType === 'error' ? 'assertive' : 'polite');
   toast.classList.add('show');
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => toast.classList.remove('show'), dur);
+  const dismiss = () => toast.classList.remove('show');
+  toast.querySelector('.toast-close').addEventListener('click', dismiss);
+  toast._t = setTimeout(dismiss, dur);
 }
 
 // ===== MOBILE MENU FUNCTIONS =====
@@ -2131,7 +2177,7 @@ $('clearRecentBtn').addEventListener('click', () => {
 // ===== LOAD RECENT FILE =====
 async function loadRecentFile(file) {
   try {
-    showToast(`📄 Loading ${file.name}...`, 'info');
+    showToast(`Loading ${file.name}...`, 'info');
     const response = await fetch(`/api/files/${encodeURIComponent(file.name)}`);
     if (!response.ok) throw new Error('File not found');
     const blob = await response.blob();
@@ -2419,7 +2465,7 @@ async function loadPdfDocument(file) {
   }
 
   try {
-    showToast('📄 Loading PDF...', 'info');
+    showToast('Loading PDF...', 'info');
     const arrayBuffer = await file.arrayBuffer();
     const pdfjsLibRef = window.pdfjsLib;
 
@@ -2455,17 +2501,17 @@ async function loadPdfDocument(file) {
 
     const uploadedUrl = await uploadPdfToCloudinary(file);
     if (uploadedUrl) {
-      showToast('☁️ PDF uploaded to Cloudinary', 'success', 1500);
+      showToast('PDF uploaded to Cloudinary', 'success', 1500);
     }
 
     await preparePdfPagesForScroll(pdfDoc);
     renderPages();
     readerArea.scrollTop = 0;
-    $('pdfStatus').textContent = `📄 ${file.name}`;
-    showToast(`✅ PDF loaded: ${pdfDoc.numPages} pages`, 'success');
+    $('pdfStatus').textContent = file.name;
+    showToast(`PDF loaded: ${pdfDoc.numPages} pages`, 'success');
   } catch (err) {
     console.error('PDF load error:', err);
-    showToast('❌ Failed to load PDF', 'error');
+    showToast('Failed to load PDF', 'error');
   }
 }
 
@@ -2744,7 +2790,7 @@ function showCloudinaryRefreshNotice(book, errorMessage = '') {
   notice.className = 'cloudinary-refresh-notice';
   notice.style.cssText = 'margin: 0 0 12px; padding: 14px 16px; border: 1px solid #f59e0b; background: #fff7ed; border-radius: 12px; color: #7c2d12;';
   notice.innerHTML = `
-    <div style="font-weight:700; font-size:14px; margin-bottom:6px;">⚠️ Stale Cloudinary file detected</div>
+    <div style="font-weight:700; font-size:14px; margin-bottom:6px;">Stale Cloudinary file detected</div>
     <div style="font-size:13px; line-height:1.5; margin-bottom:8px;">
       This book cannot open because the stored Cloudinary file is stale, invalid, or not a real PDF. Upload a fresh PDF to replace it.
     </div>
@@ -2781,7 +2827,7 @@ const bookLogos = ['KOD', 'Kaom', 'MOD', 'MONAN', 'R*SE', 'Drople', 'Aquat', 'Co
 async function loadGutendexBooks(searchQuery = '') {
   try {
     $('libraryBooks').innerHTML = '<div class="library-status">Loading your shelf&hellip;</div>';
-    showToast('☁️ Loading books...', 'info');
+    showToast('Loading books...', 'info');
     const res = await fetch('/api/cloudinary-books', { cache: 'no-store' });
     
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2799,7 +2845,7 @@ async function loadGutendexBooks(searchQuery = '') {
     updateLibraryCount(filteredBooks.length, allBooks.length);
 
     const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8', 'color-9', 'color-10'];
-    const badges = ['✦', '◆', '◇', '♢', '✧', '★', '☆', '✿', '❋', '✤'];
+    const badges = [];
 
     const legacyBooksHtml = filteredBooks.map((book, idx) => {
       const logo = bookLogos[idx % bookLogos.length];
@@ -2815,13 +2861,11 @@ async function loadGutendexBooks(searchQuery = '') {
 
     const booksHtml = filteredBooks.map((book, idx) => {
       const title = escapeHtml(book.title || 'Untitled book');
-      const author = escapeHtml(book.author || 'Unknown author');
       const number = String(idx + 1).padStart(2, '0');
       return `<div class="gutendex-book" data-book-idx="${idx}" role="button" tabindex="0" aria-label="Open ${title}">
         <span class="book-mark" aria-hidden="true"></span>
         <span class="book-index" aria-hidden="true">${number}</span>
         <span class="title">${title}</span>
-        <span class="meta">${author}</span>
         <span class="action">Open book</span>
       </div>`;
     }).join('');
@@ -2838,7 +2882,7 @@ async function loadGutendexBooks(searchQuery = '') {
       });
     });
     
-    showToast(`✅ Loaded ${filteredBooks.length} of ${allBooks.length} books`, 'success', 1500);
+    showToast(`Loaded ${filteredBooks.length} of ${allBooks.length} books`, 'success', 1500);
   } catch (err) {
     console.error('Cloudinary books error:', err);
     $('libraryBooks').innerHTML = `<div class="library-empty">Unable to load the library. ${escapeHtml(err.message)}</div>`;
@@ -2849,7 +2893,7 @@ async function loadGutendexBooks(searchQuery = '') {
 
 async function loadCloudinaryBook(book) {
   try {
-    showToast(`📖 Loading ${book.title}...`, 'info');
+    showToast(`Loading ${book.title}...`, 'info');
 
     const resourceType = book.resource_type || 'raw';
     const fileUrl = book.url || `/api/cloudinary-file/${encodeURIComponent(book.public_id || book.title)}/${encodeURIComponent(resourceType)}`;
@@ -2859,7 +2903,7 @@ async function loadCloudinaryBook(book) {
       const statusText = `${response.status} ${response.statusText}`.trim();
       const staleHint = `Cloudinary returned ${statusText}. Try re-uploading the PDF.`;
       showCloudinaryRefreshNotice(book, staleHint);
-      showToast('⚠️ Could not load this file. Try uploading a fresh PDF.', 'error', 7000);
+      showToast('Could not load this file. Try uploading a fresh PDF.', 'error', 7000);
       throw new Error(staleHint);
     }
 
@@ -2872,7 +2916,7 @@ async function loadCloudinaryBook(book) {
     } catch (pdfErr) {
       const pdfHint = `PDF parsing failed: ${pdfErr.message}`;
       showCloudinaryRefreshNotice(book, pdfHint);
-      showToast('⚠️ This file is not a valid PDF. Upload a different file.', 'error', 7000);
+      showToast('This file is not a valid PDF. Upload a different file.', 'error', 7000);
       throw new Error(pdfHint);
     }
 
@@ -2904,7 +2948,7 @@ async function loadCloudinaryBook(book) {
     initSpine();
     initChapterList();
     closeLibraryModal();
-    showToast(`✅ Loaded: ${book.title}`, 'success', 2000);
+    showToast(`Loaded: ${book.title}`, 'success', 2000);
   } catch (err) {
     console.error('Cloudinary book load error:', err);
     if (!String(err.message).includes('Cloudinary returned') && !String(err.message).includes('PDF parsing failed')) {
@@ -3483,8 +3527,8 @@ function applyHighlightSelection(rangeOverride = null) {
 
     Object.assign(wrapper.style, shapeStyles[activeHighlightStyle.shape] || shapeStyles.underline);
     wrapper.tabIndex = 0;
-    wrapper.title = 'Remove highlight';
-    wrapper.onclick = function (e) {
+    wrapper.title = 'Double-click to remove highlight';
+    wrapper.ondblclick = function (e) {
       e.stopPropagation();
       if (confirm('Remove highlight?')) {
         const parent = this.parentNode;
@@ -3799,7 +3843,6 @@ function initTimerModal() {
   }
 
   const mainHeading = document.getElementById('mainHeading');
-  const supportingText = document.getElementById('supportingText');
   const spinBtn = document.getElementById('spinBtn');
   const timerBtn = document.getElementById('timerBtn');
   const timeDisplay = document.getElementById('timeDisplay');
@@ -3851,9 +3894,6 @@ function initTimerModal() {
   function updateDisplay(isLoading = false, customText = '') {
     const nextText = customText || (isLoading ? aiChoosingText : getDisplayTopicText(currentIndex));
     mainHeading.textContent = nextText;
-    if (supportingText) {
-      supportingText.textContent = nextText;
-    }
     timerSvg.classList.toggle('is-loading', isLoading);
   }
 
