@@ -64,9 +64,18 @@ const UNSUPPORTED_GROQ_MODELS = new Set([
 
 function sanitizeGroqText(rawText) {
   return String(rawText || '')
+    // Remove <think>...</think> blocks (greedy and multiline)
+    .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '')
     .replace(/<\s*\/\s*think\s*>/gi, '')
+    // Remove any orphaned think tags
+    .replace(/<\s*\/?think[^>]*>/gi, '')
+    // Remove markdown code blocks
     .replace(/```json|```/gi, '')
+    // Remove any remaining XML/HTML-like tags that might be metadata
+    .replace(/<[^>]*>/g, '')
+    // Clean up extra whitespace
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
