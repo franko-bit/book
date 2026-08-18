@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Book Reader · AI Companion</title>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     /* ===== EDITORIAL DESIGN SYSTEM TOKENS ===== */
 :root {
@@ -925,26 +925,27 @@ body.dark .library-count {
 body.dark .modal-close { color: #b0a89c; }
 .modal-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 
-/* ===== LIBRARY MODAL ===== */
+/* ===== LIBRARY MODAL - GEOMETRIC BOLD DESIGN ===== */
 .library-modal .modal {
   width: min(96vw, 1500px);
   height: min(92vh, 980px);
   max-width: none;
   max-height: none;
-  padding: 28px 28px 20px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(252,251,249,0.98), rgba(245,242,238,0.98));
-  box-shadow: 0 30px 80px rgba(36, 31, 28, 0.16);
+  padding: 28px 32px 20px;
+  border-radius: 0;
+  background: linear-gradient(135deg, #ff9970 0%, #ff8860 100%);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 18px;
-  border: 1px solid rgba(145, 138, 128, 0.28);
+  border: none;
 }
+
 body.dark .library-modal .modal {
-  background: linear-gradient(180deg, rgba(38,38,38,0.98), rgba(29,29,29,0.98));
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
-  border-color: rgba(132, 126, 118, 0.32);
+  background: linear-gradient(135deg, #d97a5a 0%, #c96850 100%);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
 }
+
 .library-header {
   display: flex;
   align-items: center;
@@ -952,13 +953,21 @@ body.dark .library-modal .modal {
   gap: 20px;
   padding: 6px 12px 0;
 }
+
 .library-header .modal-title {
   margin: 0;
-  font-size: clamp(2rem, 2.6vw, 3rem);
-  letter-spacing: -0.03em;
-  color: #2d2a26;
+  font-size: clamp(2.2rem, 2.8vw, 3.2rem);
+  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  font-weight: 900;
+  font-family: 'Inter', -apple-system, sans-serif;
 }
-body.dark .library-header .modal-title { color: #f2efe9; }
+
+body.dark .library-header .modal-title { 
+  color: #fef6f1;
+}
+
+/* ===== LIBRARY TOOLBAR ===== */
 .library-toolbar {
   display: flex;
   gap: 12px;
@@ -966,94 +975,241 @@ body.dark .library-header .modal-title { color: #f2efe9; }
   padding: 0 12px;
   flex-wrap: wrap;
 }
+
 .library-toolbar input {
   flex: 1 1 320px;
   min-width: 220px;
-  border: 1px solid rgba(120, 115, 108, 0.32);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.75);
-  color: #20201f;
+  border: 3px solid rgba(26, 26, 26, 0.3);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
   font-family: inherit;
   font-size: 15px;
   padding: 14px 18px;
   height: 52px;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.02);
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
 }
+
 body.dark .library-toolbar input {
-  background: rgba(48,48,48,0.9);
-  border-color: rgba(160,155,148,0.22);
-  color: #f2efe9;
+  background: rgba(40, 40, 40, 0.95);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fef6f1;
 }
+
 .library-toolbar button {
   height: 52px;
-  padding: 0 22px;
-  border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  color: #fff;
-  font-weight: 600;
+  padding: 0 28px;
+  border: 3px solid #1a1a1a;
+  border-radius: 0;
+  background: #1a1a1a;
+  color: #fef6f1;
+  font-weight: 900;
   font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 10px 22px rgba(25, 92, 194, 0.22);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
-.library-toolbar button:hover { filter: brightness(1.04); }
+
+.library-toolbar button:hover { 
+  transform: translateY(-2px);
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .library-toolbar button {
+  background: #fef6f1;
+  color: #1a1a1a;
+  border-color: #fef6f1;
+}
+
+/* ===== LIBRARY CARD GRID ===== */
 .library-books {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  background: rgba(255,255,255,0.22);
-  border: 1px solid rgba(135,128,120,0.18);
-  border-radius: 20px;
-  padding: 10px;
+  padding: 16px 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  align-content: start;
 }
-body.dark .library-books {
-  background: rgba(27,27,27,0.5);
-  border-color: rgba(160,155,148,0.18);
-}
+
+/* ===== INDIVIDUAL BOOK CARD ===== */
 .gutendex-book {
-  padding: 18px 18px 16px;
-  border: 1px solid rgba(125, 120, 112, 0.14);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.68);
-  margin-bottom: 10px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 0;
+  padding: 28px 24px 20px;
+  border: 3px solid rgba(26, 26, 26, 0.2);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.08);
+  position: relative;
+  min-height: 200px;
+  justify-content: center;
 }
+
 body.dark .gutendex-book {
-  background: rgba(43,43,43,0.9);
-  border-color: rgba(160,155,148,0.2);
+  background: rgba(40, 40, 40, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
 }
+
 .gutendex-book:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(28, 30, 32, 0.08);
-  border-color: rgba(29,78,216,0.28);
+  transform: translateY(-6px);
+  box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.15);
+  border-color: rgba(26, 26, 26, 0.35);
 }
+
+body.dark .gutendex-book:hover {
+  box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.gutendex-book:active {
+  transform: scale(0.96);
+}
+
+/* ===== BOOK CARD LOGO / ICON ===== */
+.gutendex-book .book-logo {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  line-height: 1;
+  background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.dark .gutendex-book .book-logo {
+  background: linear-gradient(135deg, #fef6f1, #e8ddd6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== BOOK CARD TITLE ===== */
 .gutendex-book .title {
   display: block;
   font-weight: 700;
-  font-size: clamp(1rem, 1.2vw, 1.28rem);
-  color: #1d1b1a;
+  font-size: clamp(0.9rem, 1.1vw, 1.15rem);
+  color: #1a1a1a;
   line-height: 1.35;
   margin-bottom: 6px;
+  letter-spacing: -0.01em;
 }
-body.dark .gutendex-book .title { color: #f3efe9; }
+
+body.dark .gutendex-book .title {
+  color: #fef6f1;
+}
+
+/* ===== BOOK CARD AUTHOR ===== */
 .gutendex-book .meta {
   display: block;
-  color: #5f625d;
+  color: #7a7a7a;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
-body.dark .gutendex-book .meta { color: #b8b1a8; }
+
+body.dark .gutendex-book .meta {
+  color: #c8c8c8;
+}
+
+/* ===== BOOK CARD ACTION BUTTON ===== */
 .gutendex-book .action {
   display: inline-block;
-  margin-top: 10px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #1d4ed8;
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 0;
+  background: #1a1a1a;
+  transition: all 0.2s ease;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
 }
-body.dark .gutendex-book .action { color: #9ab7ff; }
+
+body.dark .gutendex-book .action {
+  background: #fef6f1;
+  color: #1a1a1a;
+}
+
+.gutendex-book:hover .action {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== BOOK CARD DECORATIVE BADGE ===== */
+.gutendex-book .book-badge {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 18px;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+
+.gutendex-book:hover .book-badge {
+  opacity: 0.8;
+}
+
+/* ===== COLOR VARIANTS - ACCENT BORDERS ===== */
+.gutendex-book.color-1 { border-top: 4px solid #ff5f4a; }
+.gutendex-book.color-2 { border-top: 4px solid #ff7a5a; }
+.gutendex-book.color-3 { border-top: 4px solid #ffb34a; }
+.gutendex-book.color-4 { border-top: 4px solid #ffd952; }
+.gutendex-book.color-5 { border-top: 4px solid #a8d5ba; }
+.gutendex-book.color-6 { border-top: 4px solid #5fa8c8; }
+.gutendex-book.color-7 { border-top: 4px solid #d98a6a; }
+.gutendex-book.color-8 { border-top: 4px solid #b8956a; }
+.gutendex-book.color-9 { border-top: 4px solid #7f9a6a; }
+.gutendex-book.color-10 { border-top: 4px solid #6a8a9a; }
+
+/* ===== MODAL CLOSE BUTTON ===== */
+.library-modal .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(26, 26, 26, 0.15);
+  border: 2px solid rgba(26, 26, 26, 0.3);
+  border-radius: 0;
+  font-size: 28px;
+  cursor: pointer;
+  color: #1a1a1a;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+body.dark .library-modal .modal-close {
+  color: #fef6f1;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.library-modal .modal-close:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 700px) {
   .library-modal .modal {
     width: 100vw;
@@ -1062,29 +1218,40 @@ body.dark .gutendex-book .action { color: #9ab7ff; }
     border-radius: 0;
     padding: 20px 16px 14px;
   }
+
   .library-header {
     align-items: flex-start;
     flex-direction: column;
   }
+
   .library-toolbar {
     padding: 0;
   }
+
   .library-toolbar input,
   .library-toolbar button {
     width: 100%;
   }
+
+  .library-books {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+    padding: 12px 4px;
+  }
+
+  .gutendex-book {
+    padding: 20px 16px 14px;
+    min-height: 170px;
+  }
+
+  .gutendex-book .book-logo {
+    font-size: 32px;
+  }
+
+  .gutendex-book .title {
+    font-size: 0.85rem;
+  }
 }
-.modal-list li {
-  padding: 12px 16px; background: var(--spectrum-gray-100);
-  cursor: pointer; font-size: 15px;
-  transition: background 0.2s;
-  border-radius: 6px;
-}
-body.dark .modal-list li { background: #363636; color: #e0dad4; }
-.modal-list li:hover { background: var(--spectrum-gray-200); }
-body.dark .modal-list li:hover { background: #424242; }
-.modal-list li.active { background: var(--spectrum-gray-200); color: #4b5320; font-weight: 500; }
-body.dark .modal-list li.active { background: #3f4a34; color: #d4e0c4; }
 
 /* ===== TIMER MODAL ===== */
 .timer-modal .modal {
@@ -1269,135 +1436,9 @@ body.dark .toast { background: #3a3a3a; }
 
 .hidden { display: none !important; }
 
-/* ===== MOBILE LAYOUT ===== */
-@media (max-width: 768px) {
-  .sidebar-left,
-  .sidebar-right {
-    display: none;
-  }
-
-  .container {
-    flex-direction: column;
-  }
-
-  .main-content {
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .reader-area {
-    padding: 20px 20px 100px;
-  }
-
-  .page-block {
-    padding: 24px 20px 30px;
-    margin: 0 auto 30px;
-  }
-
-  .page-number {
-    top: 20px;
-    right: 20px;
-    font-size: 12px;
-  }
-
-  .page-chapter-title {
-    font-size: 16px;
-    margin-bottom: 1.5rem;
-  }
-
-  .text-content p {
-    font-size: 16px;
-    line-height: 1.75;
-  }
-
-  .text-content p.paragraph-first {
-    text-indent: 1.5rem;
-  }
-
-  .header-bar {
-    padding: 0 16px;
-    height: 50px;
-  }
-
-  .book-title {
-    font-size: 14px;
-    max-width: 150px;
-  }
-
-  .reading-stats {
-    gap: 12px;
-    font-size: 12px;
-  }
-
-  .mobile-bottom-nav {
-    display: flex;
-  }
-
-  .mobile-menu-drawer {
-    display: flex;
-  }
-
-  .mobile-menu-drawer-overlay {
-    display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .reader-area {
-    padding: 16px 12px 100px;
-  }
-
-  .page-block {
-    padding: 20px 16px 24px;
-    margin: 0 auto 24px;
-  }
-
-  .page-number {
-    top: 16px;
-    right: 16px;
-    font-size: 11px;
-  }
-
-  .page-chapter-title {
-    font-size: 14px;
-    margin-bottom: 1.25rem;
-  }
-
-  .text-content p {
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 1rem;
-  }
-
-  .text-content p.paragraph-first {
-    text-indent: 1.2rem;
-  }
-
-  .header-bar {
-    padding: 0 12px;
-  }
-
-  .book-title {
-    font-size: 12px;
-    max-width: 100px;
-  }
-
-  .mobile-bottom-nav {
-    height: 80px;
-  }
-
-  .mobile-nav-button {
-    padding: 4px 8px;
-    font-size: 10px;
-  }
-
-  .mobile-nav-button svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-/* ===== MOBILE NAV ===== */
+/* ========================================
+   MOBILE NAVIGATION
+   ======================================== */
 .mobile-bottom-nav {
   display: none;
   position: fixed;
@@ -1600,6 +1641,130 @@ body.dark .mobile-paragraph-menu-item:active {
 body.dark .mobile-paragraph-menu-divider {
   background: #3a3a3a;
 }
+
+/* ===== MOBILE LAYOUT ===== */
+@media (max-width: 768px) {
+  .sidebar-left,
+  .sidebar-right {
+    display: none !important;
+  }
+
+  .container {
+    flex-direction: column;
+  }
+
+  .main-content {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .reader-area {
+    padding: 20px 20px 100px;
+  }
+
+  .page-block {
+    padding: 24px 20px 30px;
+    margin: 0 auto 30px;
+  }
+
+  .page-number {
+    top: 20px;
+    right: 20px;
+    font-size: 12px;
+  }
+
+  .page-chapter-title {
+    font-size: 16px;
+    margin-bottom: 1.5rem;
+  }
+
+  .text-content p {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .text-content p.paragraph-first {
+    text-indent: 1.5rem;
+  }
+
+  .header-bar {
+    padding: 0 16px;
+    height: 50px;
+  }
+
+  .book-title {
+    font-size: 14px;
+    max-width: 150px;
+  }
+
+  .reading-stats {
+    gap: 12px;
+    font-size: 12px;
+  }
+
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+
+  .mobile-menu-drawer {
+    display: flex !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .reader-area {
+    padding: 16px 12px 100px;
+  }
+
+  .page-block {
+    padding: 20px 16px 24px;
+    margin: 0 auto 24px;
+  }
+
+  .page-number {
+    top: 16px;
+    right: 16px;
+    font-size: 11px;
+  }
+
+  .page-chapter-title {
+    font-size: 14px;
+    margin-bottom: 1.25rem;
+  }
+
+  .text-content p {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .text-content p.paragraph-first {
+    text-indent: 1.2rem;
+  }
+
+  .header-bar {
+    padding: 0 12px;
+  }
+
+  .book-title {
+    font-size: 12px;
+    max-width: 100px;
+  }
+
+  .mobile-bottom-nav {
+    height: 80px;
+  }
+
+  .mobile-nav-button {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .mobile-nav-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}
   </style>
 </head>
 <body>
@@ -1796,21 +1961,23 @@ body.dark .mobile-paragraph-menu-divider {
   <ul class="modal-list" id="chapterList"></ul>
 </div></div>
 
-<!-- Library Modal -->
-<div class="modal-overlay library-modal" id="libraryModal"><div class="modal">
-  <button class="modal-close" onclick="closeLibraryModal()">✕</button>
-  <div class="library-header">
-    <h2 class="modal-title">☁️ Cloudinary Books</h2>
-    <span id="libraryCount" class="library-count">0 books</span>
+<!-- ===== LIBRARY MODAL ===== -->
+<div class="modal-overlay library-modal" id="libraryModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeLibraryModal()">✕</button>
+    <div class="library-header">
+      <h2 class="modal-title">📚 Library</h2>
+      <span id="libraryCount" class="library-count">0 books</span>
+    </div>
+    <div class="library-toolbar">
+      <input type="text" id="librarySearchInput" placeholder="Search books...">
+      <button id="librarySearchBtn">Search</button>
+    </div>
+    <div id="libraryBooks" class="library-books">
+      <div style="color:var(--spectrum-gray-600);font-size:14px;padding:20px;text-align:center;grid-column:1/-1;">☁️ Loading books...</div>
+    </div>
   </div>
-  <div class="library-toolbar">
-    <input type="text" id="librarySearchInput" placeholder="Search public domain books...">
-    <button id="librarySearchBtn">Search</button>
-  </div>
-  <div id="libraryBooks" class="library-books">
-    <div style="color:var(--spectrum-gray-600);font-size:14px;padding:20px;text-align:center;">☁️ Loading books from Cloudinary...</div>
-  </div>
-</div></div>
+</div>
 
 <!-- Search Modal -->
 <div class="modal-overlay" id="searchModal"><div class="modal">
@@ -1830,7 +1997,7 @@ body.dark .mobile-paragraph-menu-divider {
   <div id="notesList" style="display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow:auto;padding-right:4px;"></div>
 </div></div>
 
-<!-- Mobile Menu Drawer -->
+<!-- ===== MOBILE MENU DRAWER ===== -->
 <div class="mobile-menu-drawer" id="mobileMenuDrawer">
   <button class="mobile-menu-item" id="mobileHomeBtn" onclick="closeMobileMenu();document.getElementById('homeBtn').click();">
     <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
@@ -1856,7 +2023,7 @@ body.dark .mobile-paragraph-menu-divider {
 </div>
 <div class="mobile-menu-drawer-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
 
-<!-- Mobile Bottom Navigation Bar -->
+<!-- ===== MOBILE BOTTOM NAVIGATION BAR ===== -->
 <div class="mobile-bottom-nav" id="mobileBottomNav">
   <button class="mobile-nav-button" id="mobileMenuBtn" onclick="openMobileMenu();" title="Menu">
     <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
@@ -1880,7 +2047,7 @@ body.dark .mobile-paragraph-menu-divider {
   </button>
 </div>
 
-<!-- Mobile Paragraph Context Menu -->
+<!-- ===== MOBILE PARAGRAPH CONTEXT MENU ===== -->
 <div class="mobile-paragraph-menu" id="mobileParagraphMenu">
   <button class="mobile-paragraph-menu-item" id="mobileParagraphRead" onclick="handleMobileParagraphAction('read')">🔊 Read Aloud</button>
   <button class="mobile-paragraph-menu-item" id="mobileParagraphHighlight" onclick="handleMobileParagraphAction('highlight')">🖍 Highlight</button>
@@ -2015,7 +2182,7 @@ function showToast(msg, type = 'info', dur = 3000) {
   toast._t = setTimeout(() => toast.classList.remove('show'), dur);
 }
 
-// ===== MOBILE MENU =====
+// ===== MOBILE MENU FUNCTIONS =====
 function openMobileMenu() {
   const drawer = $('mobileMenuDrawer');
   const overlay = $('mobileMenuOverlay');
@@ -2523,7 +2690,7 @@ function buildPdfPageHtml(text) {
   const blocks = String(text)
     .replace(/\r/g, '')
     .split(/\n\s*\n+/)
-        .map(block => normalizePdfDisplayText(block))
+    .map(block => normalizePdfDisplayText(block))
     .filter(Boolean);
 
   if (!blocks.length) {
@@ -2592,7 +2759,6 @@ async function loadPdfDocument(file) {
 
     bookTitleDisplay.textContent = file.name.replace(/\.pdf$/i, '');
 
-    // Switch to reader mode
     landingPage.style.display = 'none';
     readerMode.classList.add('active');
     readerControls.classList.add('active');
@@ -2930,10 +3096,12 @@ function showCloudinaryRefreshNotice(book, errorMessage = '') {
   }
 }
 
-// ===== LIBRARY =====
+// ===== LIBRARY - GEOMETRIC BOLD STYLE =====
+const bookLogos = ['KOD', 'Kaom', 'MOD', 'MONAN', 'R*SE', 'Drople', 'Aquat', 'Cosem', 'GoFee', 'CÖFFEE', 'ONONS', 'FASO', 'Goodit', 'ecostar', 'MOON', 'Kaom'];
+
 async function loadGutendexBooks(searchQuery = '') {
   try {
-    showToast('☁️ Loading books from Cloudinary...', 'info');
+    showToast('☁️ Loading books...', 'info');
     const res = await fetch('/api/cloudinary-books', { cache: 'no-store' });
     
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -2950,26 +3118,33 @@ async function loadGutendexBooks(searchQuery = '') {
 
     updateLibraryCount(filteredBooks.length, allBooks.length);
 
-    const booksHtml = filteredBooks.map((book, idx) => `
-      <div class="gutendex-book" data-book-idx="${idx}">
-        <span class="title">${book.title}</span>
-        <span class="meta">by ${book.author}</span>
-        <span class="action">📖 Click to read</span>
-      </div>
-    `).join('');
+    const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8', 'color-9', 'color-10'];
+    const badges = ['✦', '◆', '◇', '♢', '✧', '★', '☆', '✿', '❋', '✤'];
+
+    const booksHtml = filteredBooks.map((book, idx) => {
+      const logo = bookLogos[idx % bookLogos.length];
+      const colorClass = colors[idx % colors.length];
+      const badge = badges[idx % badges.length];
+      return `
+        <div class="gutendex-book ${colorClass}" data-book-idx="${idx}">
+          <span class="book-badge">${badge}</span>
+          <span class="title">${book.title}</span>
+        </div>
+      `;
+    }).join('');
     
-    $('libraryBooks').innerHTML = booksHtml || '<div style="padding:20px;text-align:center;color:var(--spectrum-gray-600);">No books match your search in Cloudinary.</div>';
+    $('libraryBooks').innerHTML = booksHtml || '<div style="padding:20px;text-align:center;color:var(--spectrum-gray-600);grid-column:1/-1;">No books match your search.</div>';
     
     document.querySelectorAll('.gutendex-book').forEach((el, idx) => {
       el.addEventListener('click', () => loadCloudinaryBook(filteredBooks[idx]));
     });
     
-    showToast(`✅ Loaded ${filteredBooks.length} of ${allBooks.length} books from Cloudinary`, 'success', 1500);
+    showToast(`✅ Loaded ${filteredBooks.length} of ${allBooks.length} books`, 'success', 1500);
   } catch (err) {
     console.error('Cloudinary books error:', err);
-    $('libraryBooks').innerHTML = `<div style="padding:20px;color:#d32f2f;">❌ Error loading books: ${err.message}</div>`;
+    $('libraryBooks').innerHTML = `<div style="padding:20px;color:#d32f2f;grid-column:1/-1;">❌ Error loading books: ${err.message}</div>`;
     updateLibraryCount(0, 0);
-    showToast('Failed to load books from Cloudinary', 'error');
+    showToast('Failed to load books', 'error');
   }
 }
 
@@ -2979,12 +3154,10 @@ async function loadCloudinaryBook(book) {
 
     const resourceType = book.resource_type || 'raw';
     const fileUrl = book.url || `/api/cloudinary-file/${encodeURIComponent(book.public_id || book.title)}/${encodeURIComponent(resourceType)}`;
-    console.log(`Fetching from: ${fileUrl}`);
 
     const response = await fetch(fileUrl);
     if (!response.ok) {
       const statusText = `${response.status} ${response.statusText}`.trim();
-      console.error(`Failed to fetch: ${statusText}`);
       const staleHint = `Cloudinary returned ${statusText}. Try re-uploading the PDF.`;
       showCloudinaryRefreshNotice(book, staleHint);
       showToast('⚠️ Could not load this file. Try uploading a fresh PDF.', 'error', 7000);
