@@ -64,58 +64,29 @@ const UNSUPPORTED_GROQ_MODELS = new Set([
 
 function sanitizeGroqText(rawText) {
   let text = String(rawText || '');
-  
-  // Remove <think>...</think> blocks (greedy and multiline)
+
   text = text.replace(/<think>[\s\S]*?<\/think>/gi, '');
   text = text.replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '');
-  
-  // Remove any orphaned think tags
   text = text.replace(/<\s*\/?think[^>]*>/gi, '');
-  
-  // Remove markdown code blocks
   text = text.replace(/```[\s\S]*?```/gi, '');
   text = text.replace(/```json|```/gi, '');
-  
-  // Remove thinking process markers and everything before actual content
-  text = text.replace(/Here's\s+a\s+thinking\s+process[\s\S]*?(?=\n[A-Z]|\n\n[À-ÖØ-öø-ÿa-z]|^[À-ÖØ-öø-ÿA-Z])/i, '');
-  text = text.replace(/\[Output Generation\][\s\S]*?(?="|\n\n|\n\n)/gi, '');
-  text = text.replace(/Self-Correction.*?(?=\n\n|$)/gi, '');
-  text = text.replace(/\*Self-Correction.*?(?=\n\n|$)/gi, '');
-  
-  // Remove analysis sections and numbered lists that are part of reasoning
-  text = text.replace(/^1\.\s+\*\*Analyze.*?(?=\n\n\n|\n\nTé)/is, '');
-  text = text.replace(/^\d+\.\s+\*\*.*?\*\*:.*?(?=\n\n|\n\nTé)/gim, '');
-  
-  // Remove "Ready", "Proceeds", and debug markers
-  text = text.replace(/Ready\.?✅/gi, '');
-  text = text.replace(/Proceed[s]?\.?✅/gi, '');
+
+  const reasoningPattern = /Here's\s+a\s+thinking\s+process|Draft Translation|Mental Refinement|Final check|Self-Correction|Output Generation|All constraints met|Proceed[s]?\.?✅|Matches request exactly/i;
+  if (reasoningPattern.test(text)) {
+    const labels = [...text.matchAll(/(?:Final|Output|Translation|Text)\s*:/gi)];
+    if (labels.length) {
+      text = text.slice(labels[labels.length - 1].index + labels[labels.length - 1][0].length);
+    } else {
+      text = text.replace(/^.*?(?:Here's\s+a\s+thinking\s+process\s*:)/is, '');
+    }
+    text = text.split(/\b(?:Matches request exactly|All constraints met|Output matches|Self-Correction|Proceed[s]?\.?✅)\b/i)[0];
+  }
+
+  text = text.replace(/^\s*(?:Final|Output|Translation|Text)\s*:\s*/i, '');
   text = text.replace(/\[.*?\]/g, '');
   text = text.replace(/\(Note:.*?\)/gi, '');
-  text = text.replace(/All constraints met\.?✅/gi, '');
-  text = text.replace(/Output matches.*?✅/gi, '');
-  text = text.replace(/All good\..*?✅/gi, '');
-  
-  // Remove any remaining XML/HTML-like tags that might be metadata
   text = text.replace(/<[^>]*>/g, '');
-  
-  // Clean up extra whitespace
   text = text.replace(/\s+/g, ' ').trim();
-  
-  // If text still contains thinking markers, extract just the last substantial paragraph
-  if (text.toLowerCase().includes('thinking') || text.includes('**')) {
-    const paragraphs = text.split(/\n\n+/);
-    // Get the last non-empty paragraph that doesn't look like metadata
-    for (let i = paragraphs.length - 1; i >= 0; i--) {
-      const para = paragraphs[i].trim();
-      if (para && !para.toLowerCase().includes('output') && 
-          !para.toLowerCase().includes('thinking') &&
-          !para.includes('**') &&
-          para.length > 10) {
-        return para;
-      }
-    }
-  }
-  
   return text;
 }
 
@@ -227,91 +198,145 @@ app.post('/api/groq', async (req, res) => {
 
 // ElevenLabs TTS API endpoint (proxied with retry and chunked response)
 const ELEVENLABS_URL_TEMPLATE = 'https://api.elevenlabs.io/v1/text-to-speech/{voice_id}';
+const LOCAL_TTS_URL = process.env.LOCAL_TTS_URL || '';
+const DEFAULT_LOCAL_SAMPLE_PATH = process.env.LOCAL_TTS_VOICE_SAMPLE || '';
+const LOCAL_TTS_SAMPLE_PATH = DEFAULT_LOCAL_SAMPLE_PATH;
+
+async function tryLocalTtsFallback({ text, language = 'en-US' }) {
+  const localUrl = process.env.LOCAL_TTS_URL || 'http://localhost:8000/api/tts';
+  if (!localUrl) return null;
+
+  try {
+    const sampleVoicePath = process.env.LOCAL_TTS_VOICE_SAMPLE || DEFAULT_LOCAL_SAMPLE_PATH;
+    const response = await fetch(localUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        language,
+        voice_sample: sampleVoicePath,
+        use_sample_voice: fs.existsSync(sampleVoicePath)
+      })
+    });
+
+    if (!response.ok) {
+      const textBody = await response.text();
+      throw new Error(`Local TTS fallback failed: ${response.status} ${textBody.slice(0, 150)}`);
+    }
+
+    const contentType = response.headers.get('content-type') || 'audio/wav';
+    if (contentType.includes('application/json')) {
+      const data = await response.json();
+      if (data?.audio && typeof data.audio === 'string') {
+        const match = data.audio.match(/^data:(audio\/[a-z0-9.+-]+);base64,(.*)$/i);
+        if (!match) throw new Error('Local TTS response did not include a valid audio/data URL');
+        return {
+          contentType: match[1] || 'audio/wav',
+          audioBuffer: Buffer.from(match[2], 'base64')
+        };
+      }
+      throw new Error('Local TTS returned JSON but no audio payload');
+    }
+
+    return {
+      contentType,
+      audioBuffer: Buffer.from(await response.arrayBuffer())
+    };
+  } catch (err) {
+    console.warn('⚠️ Local TTS fallback unavailable:', err.message);
+    return null;
+  }
+}
 
 app.post('/api/tts', async (req, res) => {
   const apiKey = process.env.ELEVENLABS_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set on server' });
-  
-  const { text, voice_id, language } = req.body;
+  const isElevenLabsPaused = !apiKey || String(apiKey).trim() === '' || String(apiKey).toLowerCase() === 'paused';
+  const { text, voice_id, language = 'en-US' } = req.body;
   if (!text) return res.status(400).json({ error: 'text is required' });
 
-  const selectedVoiceId = voice_id || process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
-  const url = ELEVENLABS_URL_TEMPLATE.replace('{voice_id}', selectedVoiceId);
-  
-  // Map language codes to ElevenLabs language codes
-  const languageMap = {
-    'en': 'en',
-    'es': 'es',
-    'fr': 'fr',
-    'de': 'de',
-    'it': 'it',
-    'pt': 'pt',
-    'nl': 'nl',
-    'ru': 'ru',
-    'ja': 'ja',
-    'zh': 'zh',
-    'ko': 'ko'
-  };
-  
-  const resolvedLanguage = language ? languageMap[language.toLowerCase()] || 'en' : undefined;
-  
-  const payload = {
-    text,
-    model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
-    voice_settings: {
-      stability: 0.5,
-      similarity_boost: 0.75
-    }
-  };
-  
-  // Add language if specified (for multilingual model)
-  if (resolvedLanguage) {
-    payload.language_code = resolvedLanguage;
-  }
-
-  let lastError = null;
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      console.log(`🔊 TTS (${selectedVoiceId}, lang: ${resolvedLanguage || 'auto'}) attempt ${attempt}/2: "${text.slice(0, 50)}..."`);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'xi-api-key': apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText.slice(0, 100)}`);
-      }
-
-      // Stream audio response
-      res.setHeader('Content-Type', 'audio/mpeg');
-      res.setHeader('Transfer-Encoding', 'chunked');
-      Readable.fromWeb(response.body).pipe(res);
+  if (isElevenLabsPaused) {
+    console.warn('⚠️ ELEVENLABS_API_KEY paused/blank; using local TTS fallback.');
+    const fallbackAudio = await tryLocalTtsFallback({ text, language });
+    if (fallbackAudio) {
+      res.setHeader('Content-Type', fallbackAudio.contentType || 'audio/wav');
+      res.send(fallbackAudio.audioBuffer);
       return;
-      
-    } catch (err) {
-      lastError = err;
-      console.error(`⚠️ TTS attempt ${attempt} failed:`, err.message);
-      
-      if (attempt < 2) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    return res.status(500).json({ error: 'ElevenLabs is paused and local TTS fallback unavailable' });
+  } else {
+    const selectedVoiceId = voice_id || process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
+    const url = ELEVENLABS_URL_TEMPLATE.replace('{voice_id}', selectedVoiceId);
+    const payload = {
+      text,
+      model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75
+      }
+    };
+
+    let lastError = null;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        console.log(`🔊 TTS (${voice_id}) attempt ${attempt}/2: "${text.slice(0, 50)}..."`);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          if (response.status === 401 && errorText.includes('quota_exceeded')) {
+            throw new Error('ElevenLabs quota exceeded; using local TTS fallback');
+          }
+          throw new Error(`HTTP ${response.status}: ${errorText.slice(0, 100)}`);
+        }
+
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        Readable.fromWeb(response.body).pipe(res);
+        return;
+      } catch (err) {
+        lastError = err;
+        console.error(`⚠️ TTS attempt ${attempt} failed:`, err.message);
+
+        if (attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     }
+
+    console.warn('⚠️ ElevenLabs failed; trying local TTS fallback...');
+    const fallbackAudio = await tryLocalTtsFallback({ text, language });
+    if (fallbackAudio) {
+      res.setHeader('Content-Type', fallbackAudio.contentType || 'audio/wav');
+      res.send(fallbackAudio.audioBuffer);
+      return;
+    }
+
+    console.error('💥 TTS failed:', lastError?.message);
+    return res.status(502).json({ error: 'Text-to-speech failed', details: lastError?.message || 'ElevenLabs and local fallback unavailable' });
   }
 
-  console.error('💥 TTS failed:', lastError?.message);
-  res.status(502).json({ error: 'Text-to-speech failed', details: lastError?.message });
+  const fallbackAudio = await tryLocalTtsFallback({ text, language });
+  if (fallbackAudio) {
+    res.setHeader('Content-Type', fallbackAudio.contentType || 'audio/wav');
+    res.send(fallbackAudio.audioBuffer);
+    return;
+  }
+
+  res.status(500).json({ error: 'ELEVENLABS_API_KEY not set and local TTS fallback unavailable' });
 });
 
 // Translation endpoint
@@ -351,11 +376,16 @@ app.post('/api/translate', async (req, res) => {
             model: DEFAULT_GROQ_MODEL,
             messages: [
               {
+                role: 'system',
+                content: `You are a translation engine. Translate into ${resolvedTargetLanguage}. Output only the translation. Never reveal analysis, reasoning, drafts, labels, notes, or metadata.`
+              },
+              {
                 role: 'user',
-                content: `Translate the following text to ${resolvedTargetLanguage}. Return ONLY the translated text, with no explanations or metadata.\n\n${text}`
+                content: text
               }
             ],
-            temperature: 0.2
+            temperature: 0,
+            max_tokens: 2048
           }),
           signal: controller.signal
         });
@@ -550,7 +580,7 @@ app.get('/api/cloudinary-books', async (req, res) => {
       try {
         result = await cloudinary.v2.search
           .expression(expression)
-          .max_results(100)
+          .max_results(500)
           .execute();
         if (result) break;
       } catch (err) {

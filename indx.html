@@ -226,6 +226,7 @@ body.dark .reading-stats { color: var(--text-secondary); }
 .reader-area {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 40px 40px 100px;
   scroll-behavior: smooth;
   position: relative;
@@ -501,12 +502,17 @@ body.dark .chapter-meta { color: #b0a89c; }
 .page-block {
   display: block;
   width: min(100%, 700px);
+  max-width: 100%;
+  min-width: 0;
+  aspect-ratio: var(--page-aspect-ratio, 210 / 297);
+  min-height: 0;
   background: var(--cream-bg);
   border: 1px solid var(--border-color);
   padding: 36px 48px 42px;
   margin: 0 auto 40px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   position: relative;
+  overflow: hidden;
 }
 body.dark .page-block {
   background: var(--cream-bg);
@@ -552,6 +558,7 @@ body.dark .page-chapter-title {
   width: 100%;
   max-width: 760px;
   margin: 0 auto;
+  min-width: 0;
 }
 body.dark .text-content {
   color: #d6d0ca;
@@ -566,6 +573,10 @@ body.dark .text-content {
   position: relative;
   word-spacing: 0.02em;
   padding-top: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* ===== FIRST PARAGRAPH INDENT ===== */
@@ -587,6 +598,8 @@ body.dark .text-content {
 .page-body {
   padding-top: 0;
   margin-top: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 .page-body > p,
 .page-body > div,
@@ -594,6 +607,14 @@ body.dark .text-content {
   margin-top: 0;
   padding-top: 0;
   line-height: 1.8;
+}
+
+.translated-text,
+.translated-paragraph {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 
 /* ===== HIGHLIGHTS ===== */
@@ -709,23 +730,6 @@ body.dark .reader-controls .control-btn { color: #b2b8a6; }
 .reader-controls .control-btn:hover { background: var(--spectrum-gray-100); color: #4b5320; }
 body.dark .reader-controls .control-btn:hover { background: #3f3f3f; color: #c6d4b0; }
 .reader-controls .control-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* ===== PROGRESS SPINE ===== */
-.progress-spine { width:100%; display:flex; flex-direction:column; gap:3px; align-items:center; max-height: 55vh; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
-.spine-segment {
-  width: 40px; height: 6px;
-  background: var(--spectrum-gray-300);
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-body.dark .spine-segment { background: #3a3a3a; }
-.spine-segment.active { background: #6b7e5e; }
-body.dark .spine-segment.active { background: #9ab87a; }
-.spine-segment.read { background: #a8c8a0; }
-body.dark .spine-segment.read { background: #5a7a4a; }
 
 /* ===== SELECTION TOOLBAR ===== */
 .selection-toolbar {
@@ -925,489 +929,94 @@ body.dark .library-count {
 body.dark .modal-close { color: #b0a89c; }
 .modal-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 
-/* ===== LIBRARY MODAL - GEOMETRIC BOLD DESIGN ===== */
+/* ===== LIBRARY: EDITORIAL CATALOG ===== */
+.library-modal { padding: 24px; background: rgba(31, 28, 24, 0.48); backdrop-filter: blur(5px); }
 .library-modal .modal {
-  width: min(96vw, 1500px);
-  height: min(92vh, 980px);
-  max-width: none;
-  max-height: none;
-  padding: 28px 32px 20px;
-  border-radius: 0;
-  background: linear-gradient(135deg, #ff9970 0%, #ff8860 100%);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  border: none;
+  width: min(1120px, 100%);
+  height: min(790px, calc(100vh - 48px));
+  max-width: none; max-height: none; padding: 0; overflow: hidden;
+  display: flex; flex-direction: column; gap: 0;
+  background: var(--cream-light); border: 1px solid var(--border-color);
+  box-shadow: 0 24px 70px rgba(44, 42, 38, 0.22);
 }
-
-body.dark .library-modal .modal {
-  background: linear-gradient(135deg, #d97a5a 0%, #c96850 100%);
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
-}
-
-.library-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 6px 12px 0;
-}
-
-.library-header .modal-title {
-  margin: 0;
-  font-size: clamp(2.2rem, 2.8vw, 3.2rem);
-  letter-spacing: -0.04em;
-  color: #1a1a1a;
-  font-weight: 900;
-  font-family: 'Inter', -apple-system, sans-serif;
-}
-
-body.dark .library-header .modal-title { 
-  color: #fef6f1;
-}
-
-/* ===== LIBRARY TOOLBAR ===== */
-.library-toolbar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 0 12px;
-  flex-wrap: wrap;
-}
-
-.library-toolbar input {
-  flex: 1 1 320px;
-  min-width: 220px;
-  border: 3px solid rgba(26, 26, 26, 0.3);
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.95);
-  color: #1a1a1a;
-  font-family: inherit;
-  font-size: 15px;
-  padding: 14px 18px;
-  height: 52px;
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.08);
-  font-weight: 600;
-}
-
-body.dark .library-toolbar input {
-  background: rgba(40, 40, 40, 0.95);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #fef6f1;
-}
-
-.library-toolbar button {
-  height: 52px;
-  padding: 0 28px;
-  border: 3px solid #1a1a1a;
-  border-radius: 0;
-  background: #1a1a1a;
-  color: #fef6f1;
-  font-weight: 900;
-  font-size: 15px;
-  cursor: pointer;
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.library-toolbar button:hover { 
-  transform: translateY(-2px);
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
-}
-
-body.dark .library-toolbar button {
-  background: #fef6f1;
-  color: #1a1a1a;
-  border-color: #fef6f1;
-}
-
-/* ===== LIBRARY CARD GRID ===== */
-.library-books {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 16px 8px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-  align-content: start;
-}
-
-/* ===== INDIVIDUAL BOOK CARD ===== */
-.gutendex-book {
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 0;
-  padding: 28px 24px 20px;
-  border: 3px solid rgba(26, 26, 26, 0.2);
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.08);
-  position: relative;
-  min-height: 200px;
-  justify-content: center;
-}
-
-body.dark .gutendex-book {
-  background: rgba(40, 40, 40, 0.95);
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
-}
-
-.gutendex-book:hover {
-  transform: translateY(-6px);
-  box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.15);
-  border-color: rgba(26, 26, 26, 0.35);
-}
-
-body.dark .gutendex-book:hover {
-  box-shadow: 12px 12px 0px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.gutendex-book:active {
-  transform: scale(0.96);
-}
-
-/* ===== BOOK CARD LOGO / ICON ===== */
-.gutendex-book .book-logo {
-  font-size: 38px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: #1a1a1a;
-  margin-bottom: 10px;
-  font-family: 'Inter', -apple-system, sans-serif;
-  line-height: 1;
-  background: linear-gradient(135deg, #1a1a1a, #4a4a4a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-body.dark .gutendex-book .book-logo {
-  background: linear-gradient(135deg, #fef6f1, #e8ddd6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ===== BOOK CARD TITLE ===== */
-.gutendex-book .title {
-  display: block;
-  font-weight: 700;
-  font-size: clamp(0.9rem, 1.1vw, 1.15rem);
-  color: #1a1a1a;
-  line-height: 1.35;
-  margin-bottom: 6px;
-  letter-spacing: -0.01em;
-}
-
-body.dark .gutendex-book .title {
-  color: #fef6f1;
-}
-
-/* ===== BOOK CARD AUTHOR ===== */
-.gutendex-book .meta {
-  display: block;
-  color: #7a7a7a;
-  font-size: 13px;
-  line-height: 1.4;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-body.dark .gutendex-book .meta {
-  color: #c8c8c8;
-}
-
-/* ===== BOOK CARD ACTION BUTTON ===== */
-.gutendex-book .action {
-  display: inline-block;
-  margin-top: 12px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
-  padding: 8px 20px;
-  border-radius: 0;
-  background: #1a1a1a;
-  transition: all 0.2s ease;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
-}
-
-body.dark .gutendex-book .action {
-  background: #fef6f1;
-  color: #1a1a1a;
-}
-
-.gutendex-book:hover .action {
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2);
-}
-
-/* ===== BOOK CARD DECORATIVE BADGE ===== */
-.gutendex-book .book-badge {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  font-size: 18px;
-  opacity: 0.4;
-  transition: opacity 0.2s;
-}
-
-.gutendex-book:hover .book-badge {
-  opacity: 0.8;
-}
-
-/* ===== COLOR VARIANTS - ACCENT BORDERS ===== */
-.gutendex-book.color-1 { border-top: 4px solid #ff5f4a; }
-.gutendex-book.color-2 { border-top: 4px solid #ff7a5a; }
-.gutendex-book.color-3 { border-top: 4px solid #ffb34a; }
-.gutendex-book.color-4 { border-top: 4px solid #ffd952; }
-.gutendex-book.color-5 { border-top: 4px solid #a8d5ba; }
-.gutendex-book.color-6 { border-top: 4px solid #5fa8c8; }
-.gutendex-book.color-7 { border-top: 4px solid #d98a6a; }
-.gutendex-book.color-8 { border-top: 4px solid #b8956a; }
-.gutendex-book.color-9 { border-top: 4px solid #7f9a6a; }
-.gutendex-book.color-10 { border-top: 4px solid #6a8a9a; }
-
-/* ===== MODAL CLOSE BUTTON ===== */
-.library-modal .modal-close {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  background: rgba(26, 26, 26, 0.15);
-  border: 2px solid rgba(26, 26, 26, 0.3);
-  border-radius: 0;
-  font-size: 28px;
-  cursor: pointer;
-  color: #1a1a1a;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s;
-}
-
-body.dark .library-modal .modal-close {
-  color: #fef6f1;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.library-modal .modal-close:hover {
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.1);
-}
-
-/* ===== MOBILE RESPONSIVE ===== */
+.library-modal .modal::before { content: ''; display: block; height: 5px; flex: 0 0 5px; background: var(--accent); }
+.library-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 38px 52px 24px; }
+.library-header .modal-title { margin: 0; font-family: 'EB Garamond', serif; font-size: clamp(2.3rem, 5vw, 4rem); font-weight: 500; line-height: .9; letter-spacing: -.045em; }
+.library-eyebrow { margin: 0 0 8px; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.library-count { min-width: auto; padding: 0 0 4px; border-radius: 0; background: none; color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+body.dark .library-count { background: none; color: var(--text-muted); }
+.library-toolbar { display: flex; gap: 10px; align-items: center; padding: 18px 52px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+.library-toolbar::before { content: '⌕'; color: var(--text-muted); font: 24px/1 'EB Garamond', serif; }
+.library-search-wrap { flex: 1; display: flex; align-items: center; gap: 10px; color: var(--text-muted); }
+.library-search-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; fill: currentColor; }
+.library-toolbar input { width: 100%; min-width: 0; height: 32px; border: 0; outline: 0; background: transparent; color: var(--text-primary); font: 500 15px 'Inter', sans-serif; }
+.library-toolbar input::placeholder { color: var(--text-muted); }
+.library-toolbar button { height: 38px; padding: 0 18px; border: 1px solid var(--accent); background: var(--accent); color: var(--cream-light); font: 700 12px 'Inter', sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: background 150ms ease, transform 150ms ease; }
+.library-toolbar button:hover { background: var(--spectrum-blue-500); transform: translateY(-1px); }
+.library-books { flex: 1; min-height: 0; overflow-y: auto; padding: 32px 52px 48px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; align-content: start; }
+.gutendex-book { min-height: 252px; padding: 22px 22px 18px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; text-align: left; cursor: pointer; background: var(--cream-bg); border: 1px solid var(--border-color); color: var(--text-primary); box-shadow: none; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
+.gutendex-book::before { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(140deg, transparent 35%, color-mix(in srgb, var(--accent) 10%, transparent)); pointer-events: none; }
+.gutendex-book::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent); }
+.gutendex-book:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 24px rgba(44, 42, 38, .12); }
+.gutendex-book:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.gutendex-book .book-index { position: absolute; top: 18px; right: 18px; color: var(--text-muted); font: 500 12px 'EB Garamond', serif; }
+.gutendex-book .book-mark { position: absolute; top: 0; left: 25px; width: 19px; height: 33px; background: var(--accent-light); opacity: .85; }
+.gutendex-book .book-mark::after { content: ''; position: absolute; bottom: -1px; width: 0; height: 0; border-left: 9.5px solid transparent; border-right: 9.5px solid transparent; border-bottom: 8px solid var(--cream-bg); }
+.gutendex-book .title { display: block; position: relative; margin: 0 0 8px; font: 500 clamp(1.35rem, 2vw, 1.7rem)/1.02 'EB Garamond', serif; letter-spacing: -.025em; }
+.gutendex-book .meta { display: block; position: relative; color: var(--text-secondary); font-size: 12px; font-weight: 600; line-height: 1.45; }
+.gutendex-book .action { display: block; position: relative; margin-top: 20px; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.gutendex-book .action::after { content: ' →'; }
+.library-empty, .library-status { grid-column: 1 / -1; padding: 64px 20px; color: var(--text-muted); text-align: center; font: 500 17px 'EB Garamond', serif; }
+.library-modal .modal-close { top: 22px; right: 28px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid transparent; background: transparent; color: var(--text-secondary); font-size: 23px; line-height: 1; cursor: pointer; transition: background 150ms ease, border-color 150ms ease; }
+.library-modal .modal-close:hover { background: var(--cream-dark); border-color: var(--border-color); }
+body.dark .library-modal .modal { box-shadow: 0 24px 70px rgba(0,0,0,.45); }
+body.dark .gutendex-book::before { background: linear-gradient(140deg, transparent 35%, rgba(154, 184, 122, .09)); }
+body.dark .gutendex-book .book-mark::after { border-bottom-color: var(--cream-bg); }
 @media (max-width: 700px) {
-  .library-modal .modal {
-    width: 100vw;
-    height: 100vh;
-    max-height: 100vh;
-    border-radius: 0;
-    padding: 20px 16px 14px;
-  }
-
-  .library-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .library-toolbar {
-    padding: 0;
-  }
-
-  .library-toolbar input,
-  .library-toolbar button {
-    width: 100%;
-  }
-
-  .library-books {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
-    padding: 12px 4px;
-  }
-
-  .gutendex-book {
-    padding: 20px 16px 14px;
-    min-height: 170px;
-  }
-
-  .gutendex-book .book-logo {
-    font-size: 32px;
-  }
-
-  .gutendex-book .title {
-    font-size: 0.85rem;
-  }
+  .library-modal { padding: 0; }
+  .library-modal .modal { width: 100vw; height: 100vh; }
+  .library-header { padding: 30px 24px 22px; align-items: flex-start; flex-direction: column; gap: 12px; }
+  .library-header .modal-title { font-size: 3rem; }
+  .library-count { padding: 0; }
+  .library-toolbar { padding: 14px 24px; }
+  .library-toolbar button { padding: 0 14px; }
+  .library-books { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 22px 24px 40px; }
+  .gutendex-book { min-height: 210px; padding: 18px 16px 15px; }
+  .gutendex-book .title { font-size: 1.3rem; }
+  .gutendex-book .book-index { top: 14px; right: 14px; }
+  .library-modal .modal-close { top: 20px; right: 16px; }
 }
 
 /* ===== TIMER MODAL ===== */
-.timer-modal .modal {
-  background: #FAF8F3;
-  width: min(92vw, 1100px);
-  max-width: 1100px;
-  min-height: 420px;
-  padding: 2.75rem 2.5rem;
-  border-radius: 2rem;
-  box-shadow: 0 24px 60px rgba(33, 29, 21, 0.12);
-}
-body.dark .timer-modal .modal {
-  background: #2a2a2a;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
-}
-.timer-modal .main-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3.5rem;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-.timer-modal .timer-wrapper {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.timer-modal .timer-svg {
-  display: block;
-  width: 280px;
-  height: 280px;
-  max-width: 100%;
-  height: auto;
-}
-.timer-modal .timer-svg text {
-  transform: rotate(90deg);
-  transform-origin: 140px 140px;
-}
-.timer-modal .content {
-  flex: 1 1 320px;
-  min-width: 240px;
-  padding-top: 0.25rem;
-}
-.timer-modal .heading-wrap {
-  margin: 0 0 2.5rem 0;
-  min-height: 4.5rem;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  flex: 1 1 auto;
-}
-.timer-modal #mainHeading {
-  font-size: clamp(24px, 2vw, 32px);
-  font-weight: 400;
-  line-height: 1.25;
-  color: #000;
-  max-width: 100%;
-  width: 100%;
-  margin: 0;
-  display: block;
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-body.dark .timer-modal #mainHeading {
-  color: #ece7e1;
-}
-.timer-modal .supporting {
-  font-size: 15px;
-  color: #999;
-  margin: 0 0 2.2rem 0;
-  font-style: italic;
-  letter-spacing: 0.4px;
-  min-height: 1.5rem;
-  transition: opacity 0.3s ease;
-}
-body.dark .timer-modal .supporting {
-  color: #7a7a7a;
-}
-.timer-modal .btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.timer-modal .btn {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  border-radius: 40px;
-  padding: 10px 26px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  background: transparent;
-  letter-spacing: 0.3px;
-}
-.timer-modal .btn-spin {
-  background: #2A5F52;
-  color: #fff;
-}
-.timer-modal .btn-spin:hover {
-  background: #1F4540;
-}
-.timer-modal .btn-timer {
-  background: transparent;
-  color: #2A5F52;
-  border: 1px solid #2A5F52;
-}
-.timer-modal .btn-timer:hover {
-  background: #f0ebe5;
-}
-body.dark .timer-modal .btn-timer {
-  color: #9ab87a;
-  border-color: #5a7a4a;
-}
-body.dark .timer-modal .btn-timer:hover {
-  background: #363636;
-}
-.timer-modal .timer-text {
-  font-size: 44px;
-  font-weight: 300;
-  fill: #000;
-  font-family: 'EB Garamond', serif;
-  dominant-baseline: central;
-  text-anchor: middle;
-  letter-spacing: 2px;
-}
-body.dark .timer-modal .timer-text {
-  fill: #e6e2dd;
-}
-.timer-modal .modal-close {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.8rem;
-  background: none;
-  border: none;
-  font-size: 36px;
-  cursor: pointer;
-  color: #8a8a8a;
-  padding: 0;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s;
-  font-weight: 300;
-  line-height: 1;
-}
-.timer-modal .modal-close:hover {
-  color: #2A5F52;
-}
+.timer-modal { padding: 24px; background: rgba(31, 28, 24, .48); backdrop-filter: blur(5px); }
+.timer-modal .modal { width: min(920px, 100%); max-width: none; padding: 0; overflow: hidden; background: var(--cream-light); border: 1px solid var(--border-color); border-radius: 0; box-shadow: 0 24px 70px rgba(44,42,38,.22); }
+.timer-modal .modal::before { content: ''; display: block; height: 5px; background: var(--accent); }
+.timer-modal .main-row { display: flex; flex-wrap: wrap; gap: 42px; align-items: center; padding: 46px 52px 52px; }
+.timer-modal .timer-wrapper { flex: 0 0 auto; display: grid; place-items: center; padding: 12px; border: 1px solid var(--border-color); background: var(--cream-bg); }
+.timer-modal .timer-svg { display: block; width: 245px; max-width: 100%; height: auto; }
+.timer-modal .timer-svg text { transform: rotate(90deg); transform-origin: 140px 140px; }
+.timer-modal .timer-svg.is-spinning #timerSpinnerLayer { transform-origin: 140px 140px; animation: timer-ten-spins 5s cubic-bezier(.22,.61,.36,1) 1 both; }
+@keyframes timer-ten-spins { from { transform: rotate(0deg); } to { transform: rotate(3600deg); } }
+.timer-modal .content { flex: 1 1 330px; min-width: 240px; }
+.timer-modal .content::before { content: 'Reflection prompt'; display: block; margin-bottom: 10px; color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.timer-modal .heading-wrap { margin: 0 0 18px; min-height: 94px; display: flex; align-items: flex-start; }
+.timer-modal #mainHeading { margin: 0; color: var(--text-primary); font: 500 clamp(2rem, 4vw, 3.2rem)/.98 'EB Garamond', serif; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.timer-modal .supporting { min-height: 1.5rem; margin: 0 0 26px; color: var(--text-secondary); font: italic 15px/1.55 'EB Garamond', serif; }
+.timer-modal .timer-language { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: var(--text-muted); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.timer-modal .timer-language select { padding: 7px 27px 7px 9px; border: 1px solid var(--border-color); border-radius: 0; background: var(--cream-bg); color: var(--text-primary); font: 600 12px 'Inter', sans-serif; }
+.timer-modal .btn-group { display: flex; flex-wrap: wrap; gap: 10px; }
+.timer-modal .btn { min-height: 40px; padding: 0 16px; border: 1px solid var(--accent); border-radius: 0; cursor: pointer; font: 800 11px 'Inter', sans-serif; letter-spacing: .1em; text-transform: uppercase; transition: transform 150ms ease, background 150ms ease; }
+.timer-modal .btn:hover { transform: translateY(-2px); }
+.timer-modal .btn-spin { background: var(--accent); color: var(--cream-light); }
+.timer-modal .btn-spin:hover { background: var(--spectrum-blue-500); }
+.timer-modal .btn-spin:disabled { cursor: wait; opacity: .55; transform: none; }
+.timer-modal .btn-timer { background: transparent; color: var(--accent); }
+.timer-modal .btn-timer:hover { background: var(--cream-dark); }
+.timer-modal .timer-text { fill: var(--text-primary); font: 500 44px 'EB Garamond', serif; dominant-baseline: central; text-anchor: middle; letter-spacing: 1px; }
+.timer-modal .modal-close { position: absolute; top: 20px; right: 22px; width: 36px; height: 36px; padding: 0; display: grid; place-items: center; border: 1px solid transparent; background: transparent; color: var(--text-secondary); font-size: 24px; cursor: pointer; transition: background 150ms ease, border-color 150ms ease; }
+.timer-modal .modal-close:hover { border-color: var(--border-color); background: var(--cream-dark); }
+body.dark .timer-modal .modal { box-shadow: 0 24px 70px rgba(0,0,0,.45); }
+@media (max-width: 700px) { .timer-modal { padding: 0; } .timer-modal .modal { width: 100vw; min-height: 100vh; } .timer-modal .main-row { gap: 26px; padding: 72px 24px 42px; } .timer-modal .timer-wrapper { width: 100%; } .timer-modal .timer-svg { width: 220px; } .timer-modal .heading-wrap { min-height: 0; } }
 
 /* ===== TOAST ===== */
 .toast {
@@ -1853,8 +1462,6 @@ body.dark .mobile-paragraph-menu-divider {
 
       <!-- ===== RIGHT SIDEBAR ===== -->
       <div class="sidebar-right">
-        <div class="progress-spine" id="progressSpine"></div>
-
         <button class="icon-btn" id="aiExplainBtn" title="Explain Selection" aria-label="Explain Selection">
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
         </button>
@@ -1886,11 +1493,13 @@ body.dark .mobile-paragraph-menu-divider {
     <div class="main-row">
       <div class="timer-wrapper">
         <svg class="timer-svg" id="timerSvg" viewBox="0 0 280 280" style="transform: rotate(-90deg);">
-          <circle cx="140" cy="140" r="85" fill="none" stroke="#E8E3D8" stroke-width="28" />
-          <circle cx="140" cy="140" r="85" fill="none" stroke="#D0C8E8" stroke-width="28" 
-                  stroke-dasharray="534.07" stroke-dashoffset="534.07" stroke-linecap="round" id="lightRing" />
-          <circle cx="140" cy="140" r="85" fill="none" stroke="#2A5F52" stroke-width="28" 
-                  stroke-dasharray="534.07" stroke-dashoffset="534.07" stroke-linecap="round" id="darkRing" />
+          <g id="timerSpinnerLayer">
+            <circle cx="140" cy="140" r="85" fill="none" stroke="#E8E3D8" stroke-width="28" />
+            <circle cx="140" cy="140" r="85" fill="none" stroke="#D0C8E8" stroke-width="28" 
+                    stroke-dasharray="534.07" stroke-dashoffset="534.07" stroke-linecap="round" id="lightRing" />
+            <circle cx="140" cy="140" r="85" fill="none" stroke="#2A5F52" stroke-width="28" 
+                    stroke-dasharray="534.07" stroke-dashoffset="534.07" stroke-linecap="round" id="darkRing" />
+          </g>
           <text x="140" y="140" class="timer-text" id="timeDisplay">02:10</text>
         </svg>
       </div>
@@ -1902,9 +1511,9 @@ body.dark .mobile-paragraph-menu-divider {
 
         <p class="supporting" id="supportingText">AI is choosing a topic...</p>
 
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;">
-          <label for="topicLanguageSelect" style="font-size:12px;letter-spacing:0.05em;text-transform:uppercase;color:#5d6b72;font-weight:700;">Language</label>
-          <select id="topicLanguageSelect" style="padding:8px 10px;border-radius:10px;border:1px solid #d7d3cc;background:#f7f3ef;color:#1f2d2a;font-size:14px;min-width:120px;">
+        <div class="timer-language">
+          <label for="topicLanguageSelect">Language</label>
+          <select id="topicLanguageSelect">
             <option value="en">English</option>
             <option value="es" selected>Spanish</option>
             <option value="fr">French</option>
@@ -2051,9 +1660,9 @@ body.dark .mobile-paragraph-menu-divider {
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     <span>Read</span>
   </button>
-  <button class="mobile-nav-button" id="mobileUploadBtn" onclick="document.getElementById('uploadFileInput').click();" title="Upload">
-    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-    <span>Upload</span>
+  <button class="mobile-nav-button" id="mobileTimerBtn" onclick="document.getElementById('timerToggleBtn').click();" title="Timer & Prompts" aria-label="Timer & Prompts">
+    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"></path></svg>
+    <span>Timer & Prompts</span>
   </button>
 </div>
 
@@ -2142,7 +1751,6 @@ let recentFiles = JSON.parse(localStorage.getItem('recentFiles') || '[]');
 const $ = id => document.getElementById(id);
 const textContent = $('textContent');
 const readerArea = $('readerArea');
-const progressSpine = $('progressSpine');
 const chapterList = $('chapterList');
 const toast = $('toast');
 const bookTitleDisplay = $('bookTitleDisplay');
@@ -2185,7 +1793,8 @@ const pdfState = {
   totalPages: 0,
   pageHtml: [],
   pageText: [],
-  title: ''
+  title: '',
+  pageSize: { width: 210, height: 297 }
 };
 
 // ===== UTILITY =====
@@ -2350,24 +1959,6 @@ async function handleMobileParagraphAction(action) {
     if (action === 'explain') {
       await callAI(mobileSelectedParagraphText, 'explain');
     } else if (action === 'read') {
-      // Detect language from the paragraph element if it contains a translation
-      let detectedLanguage = 'en';
-      if (mobileSelectedParagraphNode) {
-        const translatedSpan = mobileSelectedParagraphNode.querySelector('.translated-text');
-        if (translatedSpan) {
-          detectedLanguage = translatedSpan.getAttribute('data-language') || 'en';
-        }
-      }
-      
-      // If reading with specific language, we need to pass it through speakNarration
-      const currentSel = window.getSelection();
-      if (currentSel && currentSel.rangeCount === 0 && mobileSelectedParagraphNode) {
-        const range = document.createRange();
-        range.selectNodeContents(mobileSelectedParagraphNode);
-        currentSel.removeAllRanges();
-        currentSel.addRange(range);
-      }
-      
       await speakNarration(mobileSelectedParagraphText, () => { showToast('Done reading', 'success', 1500); });
     } else if (action === 'summarize') {
       await callAI(mobileSelectedParagraphText, 'summarize');
@@ -2555,6 +2146,7 @@ function buildPageShell(pageText, pageNumberValue, titleText = '') {
   const pageBlock = document.createElement('section');
   pageBlock.className = 'page-block';
   pageBlock.setAttribute('data-page', String(pageNumberValue));
+  pageBlock.style.setProperty('--page-aspect-ratio', `${pdfState.pageSize.width} / ${pdfState.pageSize.height}`);
 
   const pageNumber = document.createElement('div');
   pageNumber.className = 'page-number';
@@ -2592,17 +2184,18 @@ function renderPages() {
   const container = textContent;
   if (!container) return;
 
-  const totalPages = fullText.length || 1;
+  const totalPages = pdfState.doc ? pdfState.totalPages : fullText.length || 1;
   const pageIndex = Math.min(Math.max(1, currentDisplayPage), totalPages);
   currentDisplayPage = pageIndex;
 
   container.innerHTML = '';
-  const pageCount = fullText.length || 1;
   const titleText = (bookTitleDisplay?.textContent || 'Book').trim() || 'Book';
-  const pageEntries = Array.from({ length: pageCount }, (_, i) => fullText[i] || '').filter(Boolean);
+  const pageEntries = pdfState.doc
+    ? Array.from({ length: pdfState.totalPages }, (_, i) => ({ text: pdfState.pageText[i] || '', pageNumber: i + 1 }))
+    : fullText.map((text, i) => ({ text, pageNumber: i + 1 })).filter(entry => entry.text);
 
-  pageEntries.forEach((pageText, index) => {
-    const pageBlock = buildPageShell(pageText, index + 1, titleText);
+  pageEntries.forEach(({ text, pageNumber }) => {
+    const pageBlock = buildPageShell(text, pageNumber, titleText);
     container.appendChild(pageBlock);
   });
 
@@ -2626,6 +2219,24 @@ function renderPages() {
 
 function updatePageIndicator() {
   const totalPages = pdfState.doc ? pdfState.totalPages : fullText.length || 1;
+  const pageBlocks = Array.from(textContent?.querySelectorAll('.page-block[data-page]') || []);
+
+  if (pageBlocks.length > 1 && readerArea) {
+    const readerBounds = readerArea.getBoundingClientRect();
+    const readerCenter = readerBounds.top + readerBounds.height / 2;
+    const activeBlock = pageBlocks.reduce((closest, block) => {
+      const blockBounds = block.getBoundingClientRect();
+      const distance = Math.abs((blockBounds.top + blockBounds.height / 2) - readerCenter);
+      return !closest || distance < closest.distance ? { block, distance } : closest;
+    }, null)?.block;
+    const visiblePage = Number(activeBlock?.dataset.page);
+
+    if (Number.isFinite(visiblePage) && visiblePage > 0) {
+      currentDisplayPage = visiblePage;
+      if (pdfState.doc) pdfState.currentPage = visiblePage;
+    }
+  }
+
   const currentPage = pdfState.doc ? pdfState.currentPage : currentDisplayPage;
   const pageCountEl = $('pageCount');
 
@@ -2754,6 +2365,24 @@ function buildPdfPageHtml(text) {
     .join('');
 }
 
+async function preparePdfPagesForScroll(pdfDoc) {
+  const pageTexts = [];
+
+  for (let pageNumber = 1; pageNumber <= pdfDoc.numPages; pageNumber++) {
+    const page = await pdfDoc.getPage(pageNumber);
+    const textContent = await page.getTextContent();
+    const pageText = extractPdfParagraphs(textContent).join('\n\n');
+    pageTexts.push(pageText);
+    pdfState.pageText[pageNumber - 1] = pageText;
+    pdfState.pageHtml[pageNumber - 1] = buildPdfPageHtml(pageText);
+  }
+
+  fullText.length = 0;
+  fullText.push(...pageTexts);
+  currentDisplayPage = 1;
+  pdfState.currentPage = 1;
+}
+
 async function uploadPdfToCloudinary(file) {
   if (!file) return null;
 
@@ -2809,6 +2438,13 @@ async function loadPdfDocument(file) {
     pdfState.title = file.name;
     pdfState.cloudUrl = '';
 
+    const firstPage = await pdfDoc.getPage(1);
+    const firstViewport = firstPage.getViewport({ scale: 1 });
+    pdfState.pageSize = {
+      width: firstViewport.width,
+      height: firstViewport.height
+    };
+
     bookTitleDisplay.textContent = file.name.replace(/\.pdf$/i, '');
 
     landingPage.style.display = 'none';
@@ -2822,7 +2458,9 @@ async function loadPdfDocument(file) {
       showToast('☁️ PDF uploaded to Cloudinary', 'success', 1500);
     }
 
-    await loadPdfPage(1);
+    await preparePdfPagesForScroll(pdfDoc);
+    renderPages();
+    readerArea.scrollTop = 0;
     $('pdfStatus').textContent = `📄 ${file.name}`;
     showToast(`✅ PDF loaded: ${pdfDoc.numPages} pages`, 'success');
   } catch (err) {
@@ -2887,7 +2525,6 @@ function renderPdfPage(pageNumber) {
   buildSentenceElements();
 }
 
-// ===== SPLIT TEXT INTO SENTENCES =====
 function splitIntoSentences(text) {
   const sentences = [];
   let current = '';
@@ -2940,7 +2577,6 @@ function buildSentenceElements() {
   sentenceElements = Array.from(container.querySelectorAll('.sentence'));
 }
 
-// ===== HIGHLIGHT SENTENCE =====
 function highlightSentence(index) {
   sentenceElements.forEach((el, i) => {
     el.classList.remove('active', 'done');
@@ -2954,7 +2590,6 @@ function highlightSentence(index) {
   }
 }
 
-// ===== SIMULATE NARRATION WITH HIGHLIGHTING =====
 function simulateNarrationWithHighlight(text, callback) {
   buildSentenceElements();
   
@@ -3013,6 +2648,15 @@ async function goToPdfPage(num) {
   if (highlightInterval) clearInterval(highlightInterval);
   window.speechSynthesis.cancel();
   currentSentenceIndex = -1;
+  const pageBlock = textContent.querySelector(`.page-block[data-page="${num}"]`);
+  if (pageBlock) {
+    pdfState.currentPage = num;
+    currentDisplayPage = num;
+    pageBlock.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    updatePageIndicator();
+    updateSpineActive();
+    return;
+  }
   await loadPdfPage(num);
 }
 
@@ -3062,24 +2706,7 @@ function renderHighlightedText(sourceText, sourceHighlights = highlights) {
 }
 
 function initSpine() {
-  progressSpine.innerHTML = '';
-  if (pdfState.doc) {
-    for (let i = 1; i <= pdfState.totalPages; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'spine-segment' + (i === pdfState.currentPage ? ' active' : '');
-      btn.title = `Page ${i}`;
-      btn.onclick = () => goToPdfPage(i);
-      progressSpine.appendChild(btn);
-    }
-    return;
-  }
-  chapters.forEach((ch, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'spine-segment' + (i === currentChapter - 1 ? ' active' : '');
-    btn.title = ch.title;
-    btn.onclick = () => goToChapter(ch.num);
-    progressSpine.appendChild(btn);
-  });
+  return;
 }
 
 function initChapterList() {
@@ -3148,11 +2775,12 @@ function showCloudinaryRefreshNotice(book, errorMessage = '') {
   }
 }
 
-// ===== LIBRARY - GEOMETRIC BOLD STYLE =====
+// ===== LIBRARY - EDITORIAL CATALOG =====
 const bookLogos = ['KOD', 'Kaom', 'MOD', 'MONAN', 'R*SE', 'Drople', 'Aquat', 'Cosem', 'GoFee', 'CÖFFEE', 'ONONS', 'FASO', 'Goodit', 'ecostar', 'MOON', 'Kaom'];
 
 async function loadGutendexBooks(searchQuery = '') {
   try {
+    $('libraryBooks').innerHTML = '<div class="library-status">Loading your shelf&hellip;</div>';
     showToast('☁️ Loading books...', 'info');
     const res = await fetch('/api/cloudinary-books', { cache: 'no-store' });
     
@@ -3173,7 +2801,7 @@ async function loadGutendexBooks(searchQuery = '') {
     const colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8', 'color-9', 'color-10'];
     const badges = ['✦', '◆', '◇', '♢', '✧', '★', '☆', '✿', '❋', '✤'];
 
-    const booksHtml = filteredBooks.map((book, idx) => {
+    const legacyBooksHtml = filteredBooks.map((book, idx) => {
       const logo = bookLogos[idx % bookLogos.length];
       const colorClass = colors[idx % colors.length];
       const badge = badges[idx % badges.length];
@@ -3184,17 +2812,36 @@ async function loadGutendexBooks(searchQuery = '') {
         </div>
       `;
     }).join('');
+
+    const booksHtml = filteredBooks.map((book, idx) => {
+      const title = escapeHtml(book.title || 'Untitled book');
+      const author = escapeHtml(book.author || 'Unknown author');
+      const number = String(idx + 1).padStart(2, '0');
+      return `<div class="gutendex-book" data-book-idx="${idx}" role="button" tabindex="0" aria-label="Open ${title}">
+        <span class="book-mark" aria-hidden="true"></span>
+        <span class="book-index" aria-hidden="true">${number}</span>
+        <span class="title">${title}</span>
+        <span class="meta">${author}</span>
+        <span class="action">Open book</span>
+      </div>`;
+    }).join('');
     
-    $('libraryBooks').innerHTML = booksHtml || '<div style="padding:20px;text-align:center;color:var(--spectrum-gray-600);grid-column:1/-1;">No books match your search.</div>';
+    $('libraryBooks').innerHTML = booksHtml || '<div class="library-empty">No books match that search.</div>';
     
     document.querySelectorAll('.gutendex-book').forEach((el, idx) => {
       el.addEventListener('click', () => loadCloudinaryBook(filteredBooks[idx]));
+      el.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          loadCloudinaryBook(filteredBooks[idx]);
+        }
+      });
     });
     
     showToast(`✅ Loaded ${filteredBooks.length} of ${allBooks.length} books`, 'success', 1500);
   } catch (err) {
     console.error('Cloudinary books error:', err);
-    $('libraryBooks').innerHTML = `<div style="padding:20px;color:#d32f2f;grid-column:1/-1;">❌ Error loading books: ${err.message}</div>`;
+    $('libraryBooks').innerHTML = `<div class="library-empty">Unable to load the library. ${escapeHtml(err.message)}</div>`;
     updateLibraryCount(0, 0);
     showToast('Failed to load books', 'error');
   }
@@ -3267,6 +2914,20 @@ async function loadCloudinaryBook(book) {
 }
 
 function openLibraryModal() { 
+  const libraryTitle = document.querySelector('.library-header .modal-title');
+  if (libraryTitle) libraryTitle.textContent = 'Library';
+  const libraryHeader = document.querySelector('.library-header > div');
+  if (libraryHeader && !libraryHeader.querySelector('.library-eyebrow')) {
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'library-eyebrow';
+    eyebrow.textContent = 'Your reading shelf';
+    libraryHeader.prepend(eyebrow);
+  }
+  const closeButton = document.querySelector('.library-modal .modal-close');
+  if (closeButton) {
+    closeButton.textContent = '×';
+    closeButton.setAttribute('aria-label', 'Close library');
+  }
   $('libraryModal').classList.add('active');
   loadGutendexBooks('');
 }
@@ -3362,6 +3023,7 @@ $('bookmarksBtn').addEventListener('click', () => {
 function openTimerModal() {
   $('timerModal').classList.add('active');
   initTimerModal();
+  if (window.__showPreloadedTopics) window.__showPreloadedTopics();
 }
 
 function closeTimerModal() {
@@ -3379,43 +3041,115 @@ $('timerModal').addEventListener('click', function(e) {
 });
 
 // ===== SPEECH =====
-function speakNarrationLocal(text, callback) {
+function getLanguageCodeForVoice(language) {
+  const normalized = (language || 'en-US').trim();
+  const map = {
+    'en': 'en-US',
+    'en-us': 'en-US',
+    'en-gb': 'en-GB',
+    'fr': 'fr-FR',
+    'fr-fr': 'fr-FR',
+    'es': 'es-ES',
+    'es-es': 'es-ES',
+    'de': 'de-DE',
+    'de-de': 'de-DE',
+    'it': 'it-IT',
+    'it-it': 'it-IT',
+    'pt': 'pt-BR',
+    'pt-br': 'pt-BR',
+    'ru': 'ru-RU',
+    'ru-ru': 'ru-RU',
+    'zh': 'zh-CN',
+    'zh-cn': 'zh-CN',
+    'sw': 'sw-KE',
+    'rw': 'rw-RW'
+  };
+  return map[normalized.toLowerCase()] || normalized || 'en-US';
+}
+
+function getNarrationSegmentsForElement(rootNode) {
+  const segments = [];
+
+  function walk(node) {
+    if (!node) return;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = (node.textContent || '').trim();
+      if (text) {
+        segments.push({ text, language: 'en-US' });
+      }
+      return;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+
+    if (node.classList && node.classList.contains('translated-text')) {
+      const text = (node.textContent || '').trim();
+      const language = getLanguageCodeForVoice(node.dataset.translationLang || 'fr');
+      if (text) {
+        segments.push({ text, language });
+      }
+      return;
+    }
+
+    Array.from(node.childNodes).forEach(walk);
+  }
+
+  walk(rootNode);
+  return segments.filter(segment => segment.text && segment.text.length > 0);
+}
+
+async function readNarrationSegmentsSequentially(segments, index = 0) {
+  if (!segments || !segments.length) return;
+
+  const segment = segments[index];
+  if (!segment) return;
+
+  await new Promise((resolve) => {
+    speakNarration(segment.text, () => {
+      if (index < segments.length - 1) {
+        readNarrationSegmentsSequentially(segments, index + 1).then(resolve);
+      } else {
+        resolve();
+      }
+    }, segment.language || 'en-US');
+  });
+}
+
+function speakNarrationLocal(text, callback, language = 'en-US') {
   if (!window.speechSynthesis) { if (callback) callback(); return; }
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = 0.90;
   utter.pitch = 0.98;
   utter.volume = 1;
+  utter.lang = getLanguageCodeForVoice(language);
   const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v => v.name.includes('Samantha') || v.name.includes('Google UK English Female') || v.name.includes('Karen'));
+  const normalizedLang = getLanguageCodeForVoice(language).toLowerCase();
+  const preferred = voices.find(v => (v.lang || '').toLowerCase().startsWith(normalizedLang.slice(0, 2)))
+    || voices.find(v => (v.name || '').toLowerCase().includes('samantha') || (v.name || '').toLowerCase().includes('karen'))
+    || voices.find(v => (v.lang || '').toLowerCase().startsWith('en'));
   if (preferred) utter.voice = preferred;
   if (callback) utter.onend = callback;
   window.speechSynthesis.speak(utter);
 }
 
-async function speakNarration(text, callback) {
+async function speakNarration(text, callback, language = 'en-US') {
   if (!text || !text.trim()) { if (callback) callback(); return; }
 
-  try {
-    // Detect language from selected text
-    let language = 'en'; // Default to English
-    const sel = window.getSelection();
-    if (sel.rangeCount) {
-      const range = sel.getRangeAt(0);
-      const commonAncestor = range.commonAncestorContainer;
-      const translatedSpan = commonAncestor.nodeType === Node.ELEMENT_NODE 
-        ? commonAncestor.closest('.translated-text')
-        : commonAncestor.parentElement?.closest('.translated-text');
-      
-      if (translatedSpan) {
-        language = translatedSpan.getAttribute('data-language') || 'en';
-      }
-    }
+  const normalizedLanguage = getLanguageCodeForVoice(language);
+  const isNonEnglish = !(normalizedLanguage.toLowerCase().startsWith('en'));
 
+  if (isNonEnglish) {
+    speakNarrationLocal(text, callback, normalizedLanguage);
+    return;
+  }
+
+  try {
     const response = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim(), language })
+      body: JSON.stringify({ text: text.trim() })
     });
 
     if (!response.ok) {
@@ -3438,14 +3172,15 @@ async function speakNarration(text, callback) {
     return;
   } catch (err) {
     console.warn('ElevenLabs failed, falling back to browser voice:', err);
-    speakNarrationLocal(text, callback);
+    speakNarrationLocal(text, callback, normalizedLanguage);
   }
 }
 
 // ===== AI CALL =====
 async function callAI(input, mode) {
   if (!input) return;
-  const ctx = getPageContext();
+  const safeInput = String(input).slice(0, 6000);
+  const ctx = getPageContext().slice(0, 3000);
   let prompt = '';
   const systemMsg = `You are a world-class female audiobook narrator and literary guide. Your voice is warm, mature, elegant, intelligent, intimate, and deeply human. Speak slowly, calmly, and deliberately, with natural breathing, gentle pauses, and expressive but restrained emotion. Never rush.
 
@@ -3462,13 +3197,13 @@ REFLECTION: (2-4 sentences) Explain the deeper meaning in simple, beautiful, hum
 Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply immersive. Every sentence should feel intentional. Avoid filler, excessive enthusiasm, dramatic overacting, robotic delivery, monotone speech, and rushed pacing.`;
 
   if (mode === 'explain') {
-    prompt = `Narrate this selected passage: "${input}"\nFrom the current reading: ${ctx}\nProvide Introduction, Reading, and Reflection.`;
+    prompt = `Narrate this selected passage: "${safeInput}"\nFrom the current reading: ${ctx}\nProvide Introduction, Reading, and Reflection.`;
   } else if (mode === 'ask') {
-    prompt = `The listener asks: "${input}"\nContext: ${ctx}\nRespond with Introduction, Reading (if relevant), and Reflection.`;
+    prompt = `The listener asks: "${safeInput}"\nContext: ${ctx}\nRespond with Introduction, Reading (if relevant), and Reflection.`;
   } else if (mode === 'summarize') {
-    prompt = `Summarize this passage: "${input}"\nContext: ${ctx}\nInclude Introduction, Reading, and Reflection.`;
+    prompt = `Summarize this passage: "${safeInput}"\nContext: ${ctx}\nInclude Introduction, Reading, and Reflection.`;
   } else if (mode === 'readpage') {
-    prompt = `Read this entire page aloud: "${input}"\nFrom the current reading. Provide Introduction, Reading, and Reflection.`;
+    prompt = `Read this page aloud: "${safeInput}"\nFrom the current reading. Provide Introduction, Reading, and Reflection.`;
   } else return;
 
   try {
@@ -3505,7 +3240,7 @@ Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply imme
       speakingText = `${introMatch[1].trim()} ${readingMatch[1].trim()} ${reflectionMatch[1].trim()}`;
     }
 
-    let readingText = readingMatch ? readingMatch[1].trim() : input;
+    let readingText = readingMatch ? readingMatch[1].trim() : safeInput;
     
     simulateNarrationWithHighlight(readingText, () => {
       showToast('Narration complete', 'success', 1500);
@@ -3537,9 +3272,17 @@ $('aiSummarizeBtn').addEventListener('click', async () => {
 
 $('aiReadPageBtn').addEventListener('click', async () => {
   if (isNarrating) { showToast('Narration in progress...', 'info'); return; }
-  const pageText = getPageContext();
-  if (!pageText) return showToast('No text to read', 'error');
-  await callAI(pageText, 'readpage');
+  const pageSegments = Array.from((textContent || document.body).querySelectorAll('.page-block p'))
+    .flatMap((paragraph) => getNarrationSegmentsForElement(paragraph));
+
+  if (!pageSegments.length) return showToast('No text to read', 'error');
+
+  isNarrating = true;
+  try {
+    await readNarrationSegmentsSequentially(pageSegments);
+  } finally {
+    isNarrating = false;
+  }
 });
 
 let activeSelectionRange = null;
@@ -3895,20 +3638,26 @@ async function performTranslate(text, targetLang) {
 
     const data = await res.json();
     const translated = data.translated || text;
+    const normalizedLang = String(targetLang || 'fr').trim();
 
+    let range = null;
     const sel = window.getSelection();
-    if (sel.rangeCount) {
-      const range = sel.getRangeAt(0);
+    if (sel && sel.rangeCount && sel.toString().trim()) {
+      range = sel.getRangeAt(0);
+    } else if (mobileSelectedParagraphNode) {
+      range = document.createRange();
+      range.selectNodeContents(mobileSelectedParagraphNode);
+    }
+
+    if (range) {
       const span = document.createElement('span');
       span.className = 'translated-text';
-      span.setAttribute('data-language', targetLang);
-      span.setAttribute('data-original-text', text);
+      span.dataset.translationLang = normalizedLang;
+      span.dataset.originalText = text;
       span.style.background = '#e8f0e0';
       span.style.cursor = 'pointer';
-      span.style.padding = '2px 4px';
-      span.style.borderRadius = '3px';
       span.textContent = translated;
-      span.title = 'Click to restore original';
+      span.title = 'Click to restore';
       span.onclick = function (e) {
         e.stopPropagation();
         if (confirm('Restore original?')) {
@@ -3917,14 +3666,20 @@ async function performTranslate(text, targetLang) {
           parent.normalize();
         }
       };
-      
-      // More robust replacement that preserves text flow
-      range.deleteContents();
-      range.insertNode(span);
-      range.collapse(false); // Move cursor after the inserted span
-      sel.removeAllRanges();
-      sel.addRange(range);
+
+      if (range.startContainer && range.startContainer.parentNode && range.startContainer.parentNode.closest('.page-block')) {
+        range.deleteContents();
+        range.insertNode(span);
+      } else if (mobileSelectedParagraphNode && mobileSelectedParagraphNode.closest('.page-block')) {
+        mobileSelectedParagraphNode.textContent = translated;
+        mobileSelectedParagraphNode.dataset.translationLang = normalizedLang;
+        mobileSelectedParagraphNode.dataset.originalText = text;
+        mobileSelectedParagraphNode.classList.add('translated-paragraph');
+      }
     }
+
+    selectedText = translated;
+    mobileSelectedParagraphText = translated;
     showToast('Translated', 'success');
   } catch (e) {
     console.error('Translation error:', e);
@@ -4038,14 +3793,21 @@ uploadArea.addEventListener('drop', async (e) => {
 
 // ===== TIMER MODAL INIT =====
 function initTimerModal() {
+  if (window.__timerModalInitialized) {
+    if (window.__showPreloadedTopics) window.__showPreloadedTopics();
+    return;
+  }
+
   const mainHeading = document.getElementById('mainHeading');
   const supportingText = document.getElementById('supportingText');
   const spinBtn = document.getElementById('spinBtn');
   const timerBtn = document.getElementById('timerBtn');
   const timeDisplay = document.getElementById('timeDisplay');
   const darkRing = document.getElementById('darkRing');
+  const timerSvg = document.getElementById('timerSvg');
 
-  if (!mainHeading || !spinBtn || !timerBtn || !timeDisplay || !darkRing) return;
+  if (!mainHeading || !spinBtn || !timerBtn || !timeDisplay || !darkRing || !timerSvg) return;
+  window.__timerModalInitialized = true;
 
   const topicLanguageSelect = document.getElementById('topicLanguageSelect');
   let currentIndex = 0;
@@ -4092,6 +3854,7 @@ function initTimerModal() {
     if (supportingText) {
       supportingText.textContent = nextText;
     }
+    timerSvg.classList.toggle('is-loading', isLoading);
   }
 
   async function translateTopics(topics, targetLang) {
@@ -4179,9 +3942,7 @@ function initTimerModal() {
       sourceText = getPageContext() || fullText.join('\n\n');
     }
 
-    if (!sourceText.trim()) {
-      return [];
-    }
+    if (!sourceText.trim()) return buildFallbackTopics();
 
     try {
       const prompt = `Understand the book content below and generate exactly 10 NEW discussion or reflection topics inspired by its main ideas, themes, emotions, and lessons.
@@ -4272,9 +4033,8 @@ ${sourceText.slice(0, 12000)}`;
     });
   }
 
-  // Disabled: Automatic topic generation and translation consume both API keys rapidly
-  // Uncomment below to re-enable automatic topic generation on page load
-  // loadTopics();
+  window.__showPreloadedTopics = () => updateDisplay(false);
+  loadTopics();
 
   // Remove old listeners by cloning
   const newSpin = spinBtn.cloneNode(true);
@@ -4283,38 +4043,29 @@ ${sourceText.slice(0, 12000)}`;
   timerBtn.parentNode.replaceChild(newTimer, timerBtn);
 
   newSpin.addEventListener('click', async () => {
-    if (isAnimating) return;
+    if (isAnimating || !topicPool.length) return;
     isAnimating = true;
+    newSpin.disabled = true;
+    timerSvg.classList.add('is-spinning');
 
-    mainHeading.classList.remove('multi-roll');
-    mainHeading.classList.add('roll-out');
-    updateDisplay(true);
-
-    setTimeout(async () => {
-      if (!topicPool.length) {
-        const topics = await generateTopicsFromPdf();
-        if (topics.length) {
-          topicPool = topics;
-          await refreshTranslatedTopicPool(true);
-        }
-      }
-
-      if (topicPool.length) {
-        currentIndex = getWrappedIndex(currentIndex + 1);
-        updateDisplay(false, getDisplayTopicText(currentIndex));
-      } else {
-        updateDisplay(false, 'Topic generation failed. Try uploading a PDF.');
-      }
-
-      mainHeading.classList.remove('roll-out');
-      void mainHeading.offsetWidth;
-      mainHeading.classList.add('multi-roll');
-
-      setTimeout(() => {
-        mainHeading.classList.remove('multi-roll');
-        isAnimating = false;
-      }, 1900);
-    }, 550);
+    try {
+      const totalSpins = 10;
+      let completedSpins = 0;
+      await new Promise((resolve) => {
+        const topicInterval = setInterval(() => {
+          completedSpins += 1;
+          updateDisplay(false, getDisplayTopicText(currentIndex + completedSpins));
+          if (completedSpins === totalSpins) clearInterval(topicInterval);
+        }, 500);
+        setTimeout(resolve, 5000);
+      });
+      currentIndex = getWrappedIndex(currentIndex + totalSpins);
+      updateDisplay(false);
+    } finally {
+      isAnimating = false;
+      newSpin.disabled = false;
+      timerSvg.classList.remove('is-spinning');
+    }
   });
 
   function formatTime(seconds) {
@@ -4370,6 +4121,8 @@ ${sourceText.slice(0, 12000)}`;
     updateCircle();
     mainHeading.classList.remove('roll-out', 'multi-roll');
     isAnimating = false;
+    newSpin.disabled = false;
+    timerSvg.classList.remove('is-spinning');
   };
 
   window.__resetTimerModal = closeTimer;
