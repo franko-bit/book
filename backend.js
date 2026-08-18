@@ -232,11 +232,29 @@ app.post('/api/tts', async (req, res) => {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set on server' });
   
-  const { text, voice_id } = req.body;
+  const { text, voice_id, language } = req.body;
   if (!text) return res.status(400).json({ error: 'text is required' });
 
   const selectedVoiceId = voice_id || process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
   const url = ELEVENLABS_URL_TEMPLATE.replace('{voice_id}', selectedVoiceId);
+  
+  // Map language codes to ElevenLabs language codes
+  const languageMap = {
+    'en': 'en',
+    'es': 'es',
+    'fr': 'fr',
+    'de': 'de',
+    'it': 'it',
+    'pt': 'pt',
+    'nl': 'nl',
+    'ru': 'ru',
+    'ja': 'ja',
+    'zh': 'zh',
+    'ko': 'ko'
+  };
+  
+  const resolvedLanguage = language ? languageMap[language.toLowerCase()] || 'en' : undefined;
+  
   const payload = {
     text,
     model_id: process.env.ELEVENLABS_MODEL_ID || 'eleven_multilingual_v2',
@@ -245,11 +263,16 @@ app.post('/api/tts', async (req, res) => {
       similarity_boost: 0.75
     }
   };
+  
+  // Add language if specified (for multilingual model)
+  if (resolvedLanguage) {
+    payload.language_code = resolvedLanguage;
+  }
 
   let lastError = null;
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      console.log(`🔊 TTS (${voice_id}) attempt ${attempt}/2: "${text.slice(0, 50)}..."`);
+      console.log(`🔊 TTS (${selectedVoiceId}, lang: ${resolvedLanguage || 'auto'}) attempt ${attempt}/2: "${text.slice(0, 50)}..."`);
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);

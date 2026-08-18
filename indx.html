@@ -2350,6 +2350,24 @@ async function handleMobileParagraphAction(action) {
     if (action === 'explain') {
       await callAI(mobileSelectedParagraphText, 'explain');
     } else if (action === 'read') {
+      // Detect language from the paragraph element if it contains a translation
+      let detectedLanguage = 'en';
+      if (mobileSelectedParagraphNode) {
+        const translatedSpan = mobileSelectedParagraphNode.querySelector('.translated-text');
+        if (translatedSpan) {
+          detectedLanguage = translatedSpan.getAttribute('data-language') || 'en';
+        }
+      }
+      
+      // If reading with specific language, we need to pass it through speakNarration
+      const currentSel = window.getSelection();
+      if (currentSel && currentSel.rangeCount === 0 && mobileSelectedParagraphNode) {
+        const range = document.createRange();
+        range.selectNodeContents(mobileSelectedParagraphNode);
+        currentSel.removeAllRanges();
+        currentSel.addRange(range);
+      }
+      
       await speakNarration(mobileSelectedParagraphText, () => { showToast('Done reading', 'success', 1500); });
     } else if (action === 'summarize') {
       await callAI(mobileSelectedParagraphText, 'summarize');
@@ -3379,10 +3397,25 @@ async function speakNarration(text, callback) {
   if (!text || !text.trim()) { if (callback) callback(); return; }
 
   try {
+    // Detect language from selected text
+    let language = 'en'; // Default to English
+    const sel = window.getSelection();
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      const commonAncestor = range.commonAncestorContainer;
+      const translatedSpan = commonAncestor.nodeType === Node.ELEMENT_NODE 
+        ? commonAncestor.closest('.translated-text')
+        : commonAncestor.parentElement?.closest('.translated-text');
+      
+      if (translatedSpan) {
+        language = translatedSpan.getAttribute('data-language') || 'en';
+      }
+    }
+
     const response = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim() })
+      body: JSON.stringify({ text: text.trim(), language })
     });
 
     if (!response.ok) {
@@ -3868,10 +3901,14 @@ async function performTranslate(text, targetLang) {
       const range = sel.getRangeAt(0);
       const span = document.createElement('span');
       span.className = 'translated-text';
+      span.setAttribute('data-language', targetLang);
+      span.setAttribute('data-original-text', text);
       span.style.background = '#e8f0e0';
       span.style.cursor = 'pointer';
+      span.style.padding = '2px 4px';
+      span.style.borderRadius = '3px';
       span.textContent = translated;
-      span.title = 'Click to restore';
+      span.title = 'Click to restore original';
       span.onclick = function (e) {
         e.stopPropagation();
         if (confirm('Restore original?')) {
@@ -3880,8 +3917,13 @@ async function performTranslate(text, targetLang) {
           parent.normalize();
         }
       };
+      
+      // More robust replacement that preserves text flow
       range.deleteContents();
       range.insertNode(span);
+      range.collapse(false); // Move cursor after the inserted span
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
     showToast('Translated', 'success');
   } catch (e) {
