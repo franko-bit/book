@@ -30,6 +30,26 @@ app.use(express.json({ limit: '5mb' }));
 // Groq API endpoint (proxied)
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const DEFAULT_GROQ_MODEL = 'qwen/qwen3.6-27b';
+
+// API key rotation for rate limiting
+let currentApiKeyIndex = 0;
+function getGroqApiKeys() {
+  const primary = process.env.GROQ_API_KEY;
+  const backup = process.env.GROQ_API_KEY_BACKUP;
+  return [primary, backup].filter(Boolean);
+}
+
+function rotateGroqApiKey() {
+  const keys = getGroqApiKeys();
+  currentApiKeyIndex = (currentApiKeyIndex + 1) % keys.length;
+  return keys[currentApiKeyIndex];
+}
+
+function getCurrentGroqApiKey() {
+  const keys = getGroqApiKeys();
+  return keys[currentApiKeyIndex] || keys[0];
+}
+
 const UNSUPPORTED_GROQ_MODELS = new Set([
   'llama-3.3-70b-versatile',
   'llama-3.1-8b-instant',
@@ -67,72 +87,92 @@ function getGroqModelCandidates(requestedModel) {
 }
 
 app.post('/api/groq', async (req, res) => {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY not set on server' });
+  const apiKeys = getGroqApiKeys();
+  if (!apiKeys.length) return res.status(500).json({ error: 'No GROQ_API_KEY configured on server' });
 
   const body = { ...req.body };
   const modelCandidates = getGroqModelCandidates(body.model);
   let lastError = null;
+  let lastStatus = null;
   const maxRetries = Math.min(3, modelCandidates.length + 1);
   const timeoutMs = 20000;
+  let apiKeyAttempts = 0;
+  const maxApiKeyAttempts = apiKeys.length;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    const currentModel = modelCandidates.shift();
-    if (!currentModel) break;
+  while (apiKeyAttempts < maxApiKeyAttempts) {
+    apiKeyAttempts++;
+    const currentApiKey = getCurrentGroqApiKey();
+    const modelCandidatesCopy = [...modelCandidates];
 
-    const payload = { ...body, model: currentModel };
+    console.log(`🔑 Using Groq API key index: ${currentApiKeyIndex} (attempt ${apiKeyAttempts}/${maxApiKeyAttempts})`);
 
-    try {
-      console.log(`📤 Proxying to Groq (attempt ${attempt}/${maxRetries}): model=${currentModel}, messages=${payload.messages?.length || 0}`);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const currentModel = modelCandidatesCopy.shift();
+      if (!currentModel) break;
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      const payload = { ...body, model: currentModel };
 
-      const resp = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
+      try {
+        console.log(`📤 Proxying to Groq (attempt ${attempt}/${maxRetries}): model=${currentModel}, messages=${payload.messages?.length || 0}`);
 
-      clearTimeout(timeoutId);
-      console.log(`📥 Groq response: ${resp.status}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-      const contentType = resp.headers.get('content-type') || 'application/json';
-      const text = await resp.text();
+        const resp = await fetch(GROQ_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentApiKey}`
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
 
-      if (!resp.ok) {
-        const errorText = text.substring(0, 200);
-        console.error(`❌ Groq error (${resp.status}):`, errorText);
+        clearTimeout(timeoutId);
+        console.log(`📥 Groq response: ${resp.status}`);
 
-        if ((resp.status === 400 || resp.status === 404) && modelCandidates.length > 0) {
-          console.warn(`🔁 Retrying with Groq fallback model: ${modelCandidates[0]}`);
-          continue;
+        const contentType = resp.headers.get('content-type') || 'application/json';
+        const text = await resp.text();
+
+        if (!resp.ok) {
+          lastStatus = resp.status;
+          const errorText = text.substring(0, 200);
+          console.error(`❌ Groq error (${resp.status}):`, errorText);
+
+          // If rate limited (429), switch to backup API key
+          if (resp.status === 429 && apiKeyAttempts < maxApiKeyAttempts) {
+            console.warn(`⚠️ Rate limited (429). Rotating to backup API key...`);
+            rotateGroqApiKey();
+            break; // Break inner loop, try again with backup key
+          }
+
+          // If bad request or not found with more models available, try next model
+          if ((resp.status === 400 || resp.status === 404) && modelCandidatesCopy.length > 0) {
+            console.warn(`🔁 Retrying with Groq fallback model: ${modelCandidatesCopy[0]}`);
+            continue;
+          }
         }
-      }
 
-      res.status(resp.status).type(contentType).send(text);
-      return;
+        res.status(resp.status).type(contentType).send(text);
+        return;
 
-    } catch (err) {
-      lastError = err;
-      console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
+      } catch (err) {
+        lastError = err;
+        console.error(`⚠️ Attempt ${attempt} failed:`, err.message);
 
-      if (attempt < maxRetries && modelCandidates.length > 0) {
-        const delay = attempt * 1000;
-        console.log(`⏳ Waiting ${delay}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        if (attempt < maxRetries && modelCandidatesCopy.length > 0) {
+          const delay = attempt * 1000;
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
       }
     }
   }
 
-  console.error('💥 Groq proxy failed after all retries:', lastError?.message);
-  res.status(502).json({
+  console.error('💥 Groq proxy failed after all retries and API key rotations');
+  res.status(lastStatus || 502).json({
     error: 'Unable to reach Groq API',
-    details: lastError?.message || 'Connection timeout'
+    details: lastError?.message || 'All API keys exhausted or rate limited'
   });
 });
 
