@@ -63,20 +63,60 @@ const UNSUPPORTED_GROQ_MODELS = new Set([
 ]);
 
 function sanitizeGroqText(rawText) {
-  return String(rawText || '')
-    // Remove <think>...</think> blocks (greedy and multiline)
-    .replace(/<think>[\s\S]*?<\/think>/gi, '')
-    .replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '')
-    .replace(/<\s*\/\s*think\s*>/gi, '')
-    // Remove any orphaned think tags
-    .replace(/<\s*\/?think[^>]*>/gi, '')
-    // Remove markdown code blocks
-    .replace(/```json|```/gi, '')
-    // Remove any remaining XML/HTML-like tags that might be metadata
-    .replace(/<[^>]*>/g, '')
-    // Clean up extra whitespace
-    .replace(/\s+/g, ' ')
-    .trim();
+  let text = String(rawText || '');
+  
+  // Remove <think>...</think> blocks (greedy and multiline)
+  text = text.replace(/<think>[\s\S]*?<\/think>/gi, '');
+  text = text.replace(/<think\b[^>]*>[\s\S]*?<\/think>/gi, '');
+  
+  // Remove any orphaned think tags
+  text = text.replace(/<\s*\/?think[^>]*>/gi, '');
+  
+  // Remove markdown code blocks
+  text = text.replace(/```[\s\S]*?```/gi, '');
+  text = text.replace(/```json|```/gi, '');
+  
+  // Remove thinking process markers and everything before actual content
+  text = text.replace(/Here's\s+a\s+thinking\s+process[\s\S]*?(?=\n[A-Z]|\n\n[À-ÖØ-öø-ÿa-z]|^[À-ÖØ-öø-ÿA-Z])/i, '');
+  text = text.replace(/\[Output Generation\][\s\S]*?(?="|\n\n|\n\n)/gi, '');
+  text = text.replace(/Self-Correction.*?(?=\n\n|$)/gi, '');
+  text = text.replace(/\*Self-Correction.*?(?=\n\n|$)/gi, '');
+  
+  // Remove analysis sections and numbered lists that are part of reasoning
+  text = text.replace(/^1\.\s+\*\*Analyze.*?(?=\n\n\n|\n\nTé)/is, '');
+  text = text.replace(/^\d+\.\s+\*\*.*?\*\*:.*?(?=\n\n|\n\nTé)/gim, '');
+  
+  // Remove "Ready", "Proceeds", and debug markers
+  text = text.replace(/Ready\.?✅/gi, '');
+  text = text.replace(/Proceed[s]?\.?✅/gi, '');
+  text = text.replace(/\[.*?\]/g, '');
+  text = text.replace(/\(Note:.*?\)/gi, '');
+  text = text.replace(/All constraints met\.?✅/gi, '');
+  text = text.replace(/Output matches.*?✅/gi, '');
+  text = text.replace(/All good\..*?✅/gi, '');
+  
+  // Remove any remaining XML/HTML-like tags that might be metadata
+  text = text.replace(/<[^>]*>/g, '');
+  
+  // Clean up extra whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  // If text still contains thinking markers, extract just the last substantial paragraph
+  if (text.toLowerCase().includes('thinking') || text.includes('**')) {
+    const paragraphs = text.split(/\n\n+/);
+    // Get the last non-empty paragraph that doesn't look like metadata
+    for (let i = paragraphs.length - 1; i >= 0; i--) {
+      const para = paragraphs[i].trim();
+      if (para && !para.toLowerCase().includes('output') && 
+          !para.toLowerCase().includes('thinking') &&
+          !para.includes('**') &&
+          para.length > 10) {
+        return para;
+      }
+    }
+  }
+  
+  return text;
 }
 
 function getGroqModelCandidates(requestedModel) {
@@ -314,7 +354,26 @@ app.post('/api/translate', async (req, res) => {
         }
 
         const result = await response.json();
-        const translated = sanitizeGroqText(result.choices?.[0]?.message?.content || '');
+        let translated = result.choices?.[0]?.message?.content || '';
+        
+        // First pass: aggressive cleaning of thinking blocks and metadata
+        translated = sanitizeGroqText(translated);
+        
+        // Second pass: if still contains suspicious patterns, extract just the translation
+        if (translated.length > 200 || 
+            /here|thinking|analyze|process|output|proceeding|constraint|final|check|ready|verify/i.test(translated.substring(0, 100))) {
+          // Try to extract just the actual translated content
+          // Look for content that looks like actual translation (starts with capital letter of target language)
+          const lines = translated.split('\n').filter(l => l.trim());
+          const lastCleanLine = lines[lines.length - 1];
+          
+          // If the last line looks like actual translation content, use it
+          if (lastCleanLine && lastCleanLine.length > 10 && 
+              !/^(here|ready|output|all|proceeds|match|constraints|verification)/i.test(lastCleanLine)) {
+            translated = lastCleanLine;
+          }
+        }
+        
         return res.json({ translated });
 
       } catch (err) {
