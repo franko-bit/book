@@ -2569,6 +2569,20 @@ function renderPages() {
   });
 
   sentenceElements = Array.from(container.querySelectorAll('.sentence'));
+  
+  // Add mobile paragraph tap handlers
+  if (isMobileDevice()) {
+    const paragraphs = container.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      p.style.cursor = 'pointer';
+      p.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const text = p.textContent || '';
+        showMobileParagraphMenu(e, text, p);
+      });
+    });
+  }
+  
   updatePageIndicator();
 }
 
