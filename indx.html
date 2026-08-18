@@ -1614,9 +1614,19 @@ body.dark .mobile-paragraph-menu {
   text-align: left;
   font-family: inherit;
   transition: background-color 150ms;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 body.dark .mobile-paragraph-menu-item {
   color: #e6e2dd;
+}
+
+.mobile-paragraph-menu-item svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  flex-shrink: 0;
 }
 
 .mobile-paragraph-menu-item:hover {
@@ -2049,10 +2059,22 @@ body.dark .mobile-paragraph-menu-divider {
 
 <!-- ===== MOBILE PARAGRAPH CONTEXT MENU ===== -->
 <div class="mobile-paragraph-menu" id="mobileParagraphMenu">
-  <button class="mobile-paragraph-menu-item" id="mobileParagraphRead" onclick="handleMobileParagraphAction('read')">🔊 Read Aloud</button>
-  <button class="mobile-paragraph-menu-item" id="mobileParagraphHighlight" onclick="handleMobileParagraphAction('highlight')">🖍 Highlight</button>
-  <button class="mobile-paragraph-menu-item" id="mobileParagraphNote" onclick="handleMobileParagraphAction('note')">📝 Save Note</button>
-  <button class="mobile-paragraph-menu-item" id="mobileParagraphTranslate" onclick="handleMobileParagraphAction('translate')">🌍 Translate</button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphRead" onclick="handleMobileParagraphAction('read')">
+    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.26 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+    <span>Read Aloud</span>
+  </button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphHighlight" onclick="handleMobileParagraphAction('highlight')">
+    <svg viewBox="0 0 24 24"><path d="M17.75 7L12 2.25l-5.75 5.75L2 22h20L17.75 7zm-5 5.5l2.5 2.5M9 13.5l2.5 2.5M6.5 10l2.5 2.5"/></svg>
+    <span>Highlight</span>
+  </button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphNote" onclick="handleMobileParagraphAction('note')">
+    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+    <span>Save Note</span>
+  </button>
+  <button class="mobile-paragraph-menu-item" id="mobileParagraphTranslate" onclick="handleMobileParagraphAction('translate')">
+    <svg viewBox="0 0 24 24"><path d="M12.87 15.07L10.33 12.56c.14-.35.20-.75.20-1.18 0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5c.43 0 .83-.05 1.17-.14l2.85 2.85c.27.27.68.27.95 0l1.4-1.4c.27-.27.27-.68 0-.95zM7.5 11c-1.93 0-3.5-1.57-3.5-3.5S5.57 4 7.5 4 11 5.57 11 7.5 9.43 11 7.5 11zm9.6-7.44c.73.73 1.4 1.53 1.98 2.4.59.85 1.13 1.75 1.6 2.68.08.15.21.28.37.28.22 0 .4-.18.4-.4v-.04c-.01-.07-.04-.14-.1-.2-.47-.96-1.02-1.87-1.64-2.74-.57-.82-1.23-1.57-1.95-2.27-.07-.08-.16-.12-.26-.12-.22 0-.4.18-.4.4 0 .08.03.15.1.2z"/></svg>
+    <span>Translate</span>
+  </button>
 </div>
 
 <div id="toast" class="toast"></div>
