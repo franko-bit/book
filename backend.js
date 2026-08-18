@@ -244,8 +244,8 @@ app.post('/api/tts', async (req, res) => {
 
 // Translation endpoint
 app.post('/api/translate', async (req, res) => {
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GROQ_API_KEY not set on server' });
+  const apiKeys = getGroqApiKeys();
+  if (!apiKeys.length) return res.status(500).json({ error: 'No GROQ_API_KEY configured on server' });
 
   const { text, target_language, targetLang } = req.body;
   const resolvedTargetLanguage = (target_language || targetLang || '').trim();
@@ -254,55 +254,78 @@ app.post('/api/translate', async (req, res) => {
   if (!resolvedTargetLanguage) return res.status(400).json({ error: 'target language is required' });
 
   let lastError = null;
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      console.log(`🌐 Translating to ${resolvedTargetLanguage} (attempt ${attempt}/2): ${text.slice(0, 50)}...`);
+  let lastStatus = null;
+  let apiKeyAttempts = 0;
+  const maxApiKeyAttempts = apiKeys.length;
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 20000);
+  while (apiKeyAttempts < maxApiKeyAttempts) {
+    apiKeyAttempts++;
+    const currentApiKey = getCurrentGroqApiKey();
 
-      const response = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: DEFAULT_GROQ_MODEL,
-          messages: [
-            {
-              role: 'user',
-              content: `Translate the following text to ${resolvedTargetLanguage}. Return ONLY the translated text, with no explanations or metadata.\n\n${text}`
-            }
-          ],
-          temperature: 0.2
-        }),
-        signal: controller.signal
-      });
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        console.log(`🌐 Translating to ${resolvedTargetLanguage} (attempt ${attempt}/2, API key ${apiKeyAttempts}/${maxApiKeyAttempts}): ${text.slice(0, 50)}...`);
 
-      clearTimeout(timeoutId);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText.slice(0, 200)}`);
-      }
+        const response = await fetch(GROQ_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentApiKey}`
+          },
+          body: JSON.stringify({
+            model: DEFAULT_GROQ_MODEL,
+            messages: [
+              {
+                role: 'user',
+                content: `Translate the following text to ${resolvedTargetLanguage}. Return ONLY the translated text, with no explanations or metadata.\n\n${text}`
+              }
+            ],
+            temperature: 0.2
+          }),
+          signal: controller.signal
+        });
 
-      const result = await response.json();
-      const translated = sanitizeGroqText(result.choices?.[0]?.message?.content || '');
-      return res.json({ translated });
+        clearTimeout(timeoutId);
 
-    } catch (err) {
-      lastError = err;
-      console.error(`⚠️ Translation attempt ${attempt} failed:`, err.message);
+        if (!response.ok) {
+          lastStatus = response.status;
+          const errorText = await response.text();
+          
+          // If rate limited (429), switch to backup API key
+          if (response.status === 429 && apiKeyAttempts < maxApiKeyAttempts) {
+            console.warn(`⚠️ Rate limited (429). Rotating to backup API key...`);
+            rotateGroqApiKey();
+            throw new Error('ROTATE_API_KEY'); // Signal to break inner loop
+          }
+          
+          throw new Error(`HTTP ${response.status}: ${errorText.slice(0, 200)}`);
+        }
 
-      if (attempt < 2) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const result = await response.json();
+        const translated = sanitizeGroqText(result.choices?.[0]?.message?.content || '');
+        return res.json({ translated });
+
+      } catch (err) {
+        // If we need to rotate API key, break inner loop
+        if (err.message === 'ROTATE_API_KEY') {
+          break;
+        }
+        
+        lastError = err;
+        console.error(`⚠️ Translation attempt ${attempt} failed:`, err.message);
+
+        if (attempt < 2) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
     }
   }
 
   console.error('💥 Translation failed:', lastError?.message);
-  res.status(502).json({ error: 'Translation failed', details: lastError?.message });
+  res.status(lastStatus || 502).json({ error: 'Translation failed', details: lastError?.message });
 });
 
 function isPdfBuffer(buffer) {

@@ -4210,7 +4210,9 @@ ${sourceText.slice(0, 12000)}`;
     });
   }
 
-  loadTopics();
+  // Disabled: Automatic topic generation and translation consume both API keys rapidly
+  // Uncomment below to re-enable automatic topic generation on page load
+  // loadTopics();
 
   // Remove old listeners by cloning
   const newSpin = spinBtn.cloneNode(true);
