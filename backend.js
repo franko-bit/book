@@ -979,6 +979,24 @@ function decodeXmlText(value) {
 let standardEbooksCatalogCache = { expiresAt: 0, books: [] };
 let gutenbergCatalogCache = { expiresAt: 0, books: [] };
 
+async function fetchPublicCatalog(url, options = {}, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(20000)
+      });
+      if (response.ok || (response.status < 500 && response.status !== 429)) return response;
+      lastError = new Error(`Catalog returned ${response.status}`);
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < attempts) await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+  }
+  throw lastError || new Error('Catalog request failed');
+}
+
 function getBookCategories(title, tags = [], source = '') {
   const text = `${title} ${tags.join(' ')}`.toLowerCase();
   const categories = [];
@@ -1026,7 +1044,7 @@ function getBookCategories(title, tags = [], source = '') {
 async function getStandardEbooksBooks() {
   if (standardEbooksCatalogCache.expiresAt > Date.now()) return standardEbooksCatalogCache.books;
 
-  const firstPageResponse = await fetch('https://standardebooks.org/ebooks?per-page=48&page=1', {
+  const firstPageResponse = await fetchPublicCatalog('https://standardebooks.org/ebooks?per-page=48&page=1', {
     headers: { 'User-Agent': 'BookReader/1.0 (public catalog)' }
   });
   if (!firstPageResponse.ok) throw new Error(`Standard Ebooks returned ${firstPageResponse.status}`);
@@ -1038,7 +1056,7 @@ async function getStandardEbooksBooks() {
   if (lastPage > 1) {
     for (let pageNumber = 2; pageNumber <= lastPage; pageNumber += 4) {
       const responses = await Promise.all(Array.from({ length: Math.min(4, lastPage - pageNumber + 1) }, (_, index) =>
-        fetch(`https://standardebooks.org/ebooks?per-page=48&page=${pageNumber + index}`, {
+        fetchPublicCatalog(`https://standardebooks.org/ebooks?per-page=48&page=${pageNumber + index}`, {
           headers: { 'User-Agent': 'BookReader/1.0 (public catalog)' }
         })
       ));
@@ -1077,7 +1095,7 @@ async function getGutenbergBooks() {
   if (gutenbergCatalogCache.expiresAt > Date.now()) return gutenbergCatalogCache.books;
 
   const responses = await Promise.all([1, 2, 3].map(page =>
-    fetch(`https://gutendex.com/books/?page=${page}`, {
+    fetchPublicCatalog(`https://gutendex.com/books/?page=${page}`, {
       headers: { 'User-Agent': 'BookReader/1.0 (public catalog)' }
     })
   ));
