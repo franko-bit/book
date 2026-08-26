@@ -14,7 +14,6 @@ for url, path in [
 
 models = {
     'MonkeyOCRv2': 'zenosai/MonkeyOCRv2-B',
-    'MeloTTS': 'myshell-ai/MeloTTS-English-v2',
 }
 os.makedirs('hf_models', exist_ok=True)
 for name, repo_id in models.items():

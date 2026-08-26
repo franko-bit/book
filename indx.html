@@ -43,6 +43,8 @@
   --spectrum-border-width: 1px;
   --spectrum-corner-radius: 0px;
 }
+.book-summary { width: 100%; max-width: 680px; margin: 0 auto 28px; padding: 16px 20px; border-left: 3px solid var(--accent); background: var(--cream-light); color: var(--text-secondary); font: 16px/1.55 'EB Garamond', Georgia, serif; }
+.book-summary strong { display: block; margin-bottom: 4px; color: var(--text-primary); font: 700 11px/1.2 'Inter', sans-serif; letter-spacing: .1em; text-transform: uppercase; }
 
 body.dark {
   --cream-bg: #222;
@@ -168,13 +170,14 @@ body.dark .icon-btn:active {
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #c0392b;
+  background: #2a5f52;
   color: white;
   font-size: 9px;
   font-weight: 600;
-  width: 18px;
+  min-width: 18px;
   height: 18px;
-  border-radius: 50%;
+  padding: 0 4px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -492,9 +495,7 @@ body.dark .chapter-header { color: #ece7e1; }
 .chapter-meta { font-size: 14px; color: var(--spectrum-gray-700); margin-bottom: 30px; display: flex; gap: 16px; flex-wrap: wrap; }
 body.dark .chapter-meta { color: #b0a89c; }
 .chapter-header,
-.chapter-meta,
-#chapterBtn,
-#chapterModal {
+.chapter-meta {
   display: none !important;
 }
 
@@ -505,14 +506,14 @@ body.dark .chapter-meta { color: #b0a89c; }
   max-width: 100%;
   min-width: 0;
   aspect-ratio: var(--page-aspect-ratio, 210 / 297);
-  min-height: 0;
+  height: auto;
   background: var(--cream-bg);
   border: 1px solid var(--border-color);
   padding: 36px 48px 42px;
   margin: 0 auto 40px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 body.dark .page-block {
   background: var(--cream-bg);
@@ -617,6 +618,10 @@ body.dark .text-content {
   white-space: normal;
 }
 
+.translated-text {
+  background: transparent;
+}
+
 /* ===== HIGHLIGHTS ===== */
 .highlighted-text {
   --annotation-highlight: #f1a487;
@@ -679,6 +684,15 @@ body.dark .text-content {
   background: #ffd54f;
   color: #1a1a1a;
   box-shadow: 0 0 0 2px #ffd54f;
+}
+.text-content .narration-active {
+  background: #ffd54f;
+  color: #1a1a1a;
+  box-shadow: 0 0 0 2px #ffd54f;
+}
+.text-content .narration-done {
+  background: #e8f0d0;
+  color: #4a5a3a;
 }
 body.dark .text-content .sentence.active {
   background: #6d8a4e;
@@ -951,6 +965,7 @@ body.dark .library-count { background: none; color: var(--text-muted); }
 .library-search-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; fill: currentColor; }
 .library-toolbar input { width: 100%; min-width: 0; height: 32px; border: 0; outline: 0; background: transparent; color: var(--text-primary); font: 500 15px 'Inter', sans-serif; }
 .library-toolbar input::placeholder { color: var(--text-muted); }
+.library-toolbar select { height: 38px; min-width: 170px; border: 1px solid var(--border-color); background: var(--cream-light); color: var(--text-primary); padding: 0 10px; font: 500 13px 'Inter', sans-serif; }
 .library-toolbar button { height: 38px; padding: 0 18px; border: 1px solid var(--accent); background: var(--accent); color: var(--cream-light); font: 700 12px 'Inter', sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; transition: background 150ms ease, transform 150ms ease; }
 .library-toolbar button:hover { background: var(--spectrum-blue-500); transform: translateY(-1px); }
 .library-books { flex: 1; min-height: 0; overflow-y: auto; padding: 32px 52px 48px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; align-content: start; }
@@ -962,7 +977,9 @@ body.dark .library-count { background: none; color: var(--text-muted); }
 .gutendex-book .book-index { position: absolute; top: 18px; right: 18px; color: var(--text-muted); font: 500 12px 'EB Garamond', serif; }
 .gutendex-book .book-mark { position: absolute; top: 0; left: 25px; width: 19px; height: 33px; background: var(--accent-light); opacity: .85; }
 .gutendex-book .book-mark::after { content: ''; position: absolute; bottom: -1px; width: 0; height: 0; border-left: 9.5px solid transparent; border-right: 9.5px solid transparent; border-bottom: 8px solid var(--cream-bg); }
+.gutendex-book .book-cover { position: relative; align-self: center; width: min(100%, 132px); height: 148px; margin: 0 auto auto; object-fit: cover; object-position: center; border: 1px solid var(--border-color); box-shadow: 4px 5px 0 rgba(44, 42, 38, .08); background: var(--cream-dark); }
 .gutendex-book .title { display: block; position: relative; margin: 0 0 8px; font: 500 clamp(1rem, 1.35vw, 1.2rem)/1.12 'EB Garamond', serif; letter-spacing: 0; overflow-wrap: anywhere; word-break: break-word; }
+.gutendex-book .author { display: block; position: relative; min-height: 1.2em; color: var(--text-muted); font-size: 11px; line-height: 1.25; overflow-wrap: anywhere; }
 .gutendex-book .action { display: block; position: relative; margin-top: 20px; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .gutendex-book .action::after { content: ' →'; }
 .library-empty, .library-status { grid-column: 1 / -1; padding: 64px 20px; color: var(--text-muted); text-align: center; font: 500 17px 'EB Garamond', serif; }
@@ -978,6 +995,7 @@ body.dark .gutendex-book .book-mark::after { border-bottom-color: var(--cream-bg
   .library-header .modal-title { font-size: 3rem; }
   .library-count { padding: 0; }
   .library-toolbar { padding: 14px 24px; }
+  .library-toolbar select { min-width: 0; flex: 0 1 150px; }
   .library-toolbar button { padding: 0 14px; }
   .library-books { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 22px 24px 40px; }
   .gutendex-book { min-height: 210px; padding: 18px 16px 15px; }
@@ -1431,7 +1449,7 @@ body.dark .mobile-paragraph-menu-divider {
     </button>
     <button class="icon-btn" id="libraryBtn" title="Library" aria-label="Library">
       <svg viewBox="0 0 24 24"><path d="M4 6h5v5H4V6zm7 0h5v5h-5V6zm7 0h5v5h-5V6zM4 13h5v5H4v-5zm7 0h5v5h-5v-5zm7 0h5v5h-5v-5z"/></svg>
-      <span class="badge">3</span>
+      <span class="badge" id="libraryBadge">0</span>
     </button>
     <button class="icon-btn" id="searchBtn" title="Search" aria-label="Search">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -1492,6 +1510,7 @@ body.dark .mobile-paragraph-menu-divider {
 
         <!-- ===== READER MODE ===== -->
         <div class="reader-mode" id="readerMode">
+          <div class="book-summary" id="bookSummary" hidden></div>
           <div class="text-content" id="textContent"></div>
         </div>
       </div>
@@ -1625,6 +1644,24 @@ body.dark .mobile-paragraph-menu-divider {
     </div>
     <div class="library-toolbar">
       <input type="text" id="librarySearchInput" placeholder="Search books...">
+      <select id="libraryCategoryFilter" aria-label="Filter books by category">
+        <option value="all">All categories</option>
+        <option>Fiction</option>
+        <option>Non-Fiction</option>
+        <option>Biography</option>
+        <option>Self-Help</option>
+        <option>Business</option>
+        <option>Philosophy</option>
+        <option>History</option>
+        <option>Romance</option>
+        <option>Mystery</option>
+        <option>Fantasy</option>
+        <option>Science Fiction</option>
+        <option>Poetry</option>
+        <option>Children</option>
+        <option>Classics</option>
+        <option>Other</option>
+      </select>
       <button id="librarySearchBtn">Search</button>
     </div>
     <div id="libraryBooks" class="library-books">
@@ -1753,15 +1790,50 @@ const chapters = [
 ];
 
 function detectChapterTitlesFromText(pages) {
-  if (!Array.isArray(chapters) || !chapters.length) return [];
-  return chapters.map((chapter, index) => ({
-    num: index + 1,
-    title: chapter && chapter.title ? chapter.title : `Section ${index + 1}`
-  }));
+  if (!Array.isArray(pages) || !pages.length) return [];
+
+  const detected = [];
+  const seen = new Set();
+  const addChapter = (title, page) => {
+    const cleanTitle = String(title || '').replace(/\s+/g, ' ').trim();
+    const key = cleanTitle.toLowerCase();
+    if (!cleanTitle || seen.has(key)) return;
+    seen.add(key);
+    detected.push({ num: detected.length + 1, title: cleanTitle, page });
+  };
+
+  pages.forEach((pageText, pageIndex) => {
+    const blocks = String(pageText || '').split(/\n\s*\n+/).map(block => block.trim()).filter(Boolean);
+    let pendingRomanChapter = '';
+    blocks.forEach(block => {
+      const lines = block.split(/\r?\n/).map(line => line.replace(/\s+/g, ' ').trim()).filter(Boolean);
+      lines.forEach(line => {
+        const romanChapter = line.match(/^(?:chapter\s+)?([IVXLCDM]{1,12})$/i);
+        if (romanChapter) {
+          pendingRomanChapter = romanChapter[1].toUpperCase();
+          return;
+        }
+        const chapterMatch = line.match(/^(chapter|part|book|section)\s+(?:[\divxlc]+|[a-z]+|\d+)?\s*[:.\-]?\s*(.*)$/i);
+        const numberedMatch = line.match(/^(?:chapter\s+)?(\d{1,3}|[IVXLCDM]{1,12})[.:\-]\s+(.{2,100})$/i);
+        const headingLike = line.length >= 3 && line.length <= 90
+          && !/[.!?]$/.test(line)
+          && (/^[A-Z][A-Z\s'&-]{3,}$/.test(line) || /^(?:[A-Z][a-z]+\s+){1,7}[A-Z][a-z]+$/.test(line));
+        if (pendingRomanChapter && (headingLike || chapterMatch || numberedMatch)) {
+          addChapter(`Chapter ${pendingRomanChapter}: ${line}`, pageIndex + 1);
+          pendingRomanChapter = '';
+        } else if (chapterMatch) addChapter(chapterMatch[2] || `${chapterMatch[1]} ${chapterMatch[0].split(/\s+/)[1] || ''}`, pageIndex + 1);
+        else if (numberedMatch) addChapter(numberedMatch[2], pageIndex + 1);
+        else if (headingLike) addChapter(line, pageIndex + 1);
+      });
+    });
+  });
+
+  if (detected.length) return detected;
+  return pages.map((_, index) => ({ num: index + 1, title: `Page ${index + 1}`, page: index + 1 }));
 }
 
 function syncChaptersFromBook() {
-  const pages = Array.isArray(fullText) ? fullText : [];
+  const pages = pdfState.doc ? pdfState.pageText : fullText;
   const detected = detectChapterTitlesFromText(pages);
   if (detected.length) {
     chapters.length = 0;
@@ -1779,7 +1851,10 @@ const HIGHLIGHTS_STORAGE_KEY = 'readerSavedHighlights';
 let isNarrating = false;
 let highlightInterval = null;
 let sentenceElements = [];
+let narrationSentenceCount = 0;
+let narrationCompleteCallback = null;
 let currentSentenceIndex = -1;
+let narrationAudioElement = null;
 let currentDisplayPage = 1;
 let recentFiles = JSON.parse(localStorage.getItem('recentFiles') || '[]');
 
@@ -1829,6 +1904,7 @@ const pdfState = {
   pageHtml: [],
   pageText: [],
   title: '',
+  bookId: '',
   pageSize: { width: 210, height: 297 }
 };
 
@@ -1877,6 +1953,8 @@ function closeMobileMenu() {
 // ===== MOBILE PARAGRAPH CONTEXT MENU =====
 let mobileSelectedParagraphText = '';
 let mobileSelectedParagraphNode = null;
+let pendingTranslationText = '';
+let pendingTranslationParagraph = null;
 const isMobileDevice = () => window.innerWidth <= 768;
 
 function syncMobileParagraphSelection(paragraphElement) {
@@ -1954,7 +2032,24 @@ function openTranslateModalForText(textValue) {
   modal.innerHTML = html + '<div style="display:flex;gap:10px;"><button onclick="performTranslateWithSelect()" style="flex:1;padding:8px;background:#6b7e5e;color:white;border:none;border-radius:4px;cursor:pointer;font-weight:500;">Translate</button><button onclick="this.parentElement.parentElement.remove()" style="flex:1;padding:8px;background:#ccc;border:none;border-radius:4px;cursor:pointer;">Cancel</button></div>';
   document.body.appendChild(modal);
   setTimeout(() => { const s = document.getElementById('translateLangSelect'); if (s) s.focus(); }, 100);
-  selectedText = textValue || selectedText || '';
+  pendingTranslationText = textValue || selectedText || '';
+  selectedText = pendingTranslationText;
+}
+
+function openParagraphTranslation(paragraph) {
+  if (!paragraph || !paragraph.closest('.page-block')) return;
+  mobileSelectedParagraphNode = paragraph;
+  pendingTranslationParagraph = paragraph;
+  mobileSelectedParagraphText = paragraph.textContent.trim();
+  selectedText = mobileSelectedParagraphText;
+  const range = document.createRange();
+  range.selectNodeContents(paragraph);
+  activeSelectionRange = range.cloneRange();
+  openTranslateModalForText(mobileSelectedParagraphText);
+}
+
+function bindParagraphTranslation(paragraphs) {
+  return;
 }
 
 async function handleMobileParagraphAction(action) {
@@ -1998,6 +2093,7 @@ async function handleMobileParagraphAction(action) {
 
     if (action === 'translate') {
       selectedText = mobileSelectedParagraphText;
+      pendingTranslationParagraph = mobileSelectedParagraphNode?.closest('p') || null;
       openTranslateModalForText(mobileSelectedParagraphText);
       return;
     }
@@ -2005,7 +2101,10 @@ async function handleMobileParagraphAction(action) {
     if (action === 'explain') {
       await callAI(mobileSelectedParagraphText, 'explain');
     } else if (action === 'read') {
-      await speakNarration(mobileSelectedParagraphText, () => { showToast('Done reading', 'success', 1500); });
+      unlockNarrationAudio();
+      const segments = getNarrationSegmentsForElement(mobileSelectedParagraphNode);
+      await readNarrationSegmentsSequentially(segments);
+      showToast('Done reading', 'success', 1500);
     } else if (action === 'summarize') {
       await callAI(mobileSelectedParagraphText, 'summarize');
     }
@@ -2022,8 +2121,32 @@ document.addEventListener('click', (e) => {
 
 function getPageContext() { return textContent.textContent || ''; }
 
+function getCurrentPageContext() {
+  if (pdfState.doc) {
+    return pdfState.pageText[pdfState.currentPage - 1] || '';
+  }
+  return fullText[currentDisplayPage - 1] || '';
+}
+
+function getBookOverviewContext(maxPages = 5) {
+  const pages = pdfState.doc
+    ? pdfState.pageText.filter(Boolean).slice(0, maxPages)
+    : fullText.slice(0, maxPages);
+  return pages.join('\n\n');
+}
+
 function updateLibraryCount(count, total = null) {
   const libraryCountEl = $('libraryCount');
+  const libraryBadgeEl = $('libraryBadge');
+  const formatCompactBookCount = value => {
+    const number = Math.max(0, Number(value) || 0);
+    if (number < 1000) return String(number);
+    if (number < 1000000) {
+      return `${(number / 1000).toFixed(number < 10000 ? 1 : 0).replace(/\.0$/, '')}k`;
+    }
+    return `${(number / 1000000).toFixed(1).replace(/\.0$/, '')}m`;
+  };
+  if (libraryBadgeEl) libraryBadgeEl.textContent = formatCompactBookCount(total ?? count);
   if (!libraryCountEl) return;
 
   if (typeof total === 'number' && total > 0) {
@@ -2258,6 +2381,8 @@ function renderPages() {
         showMobileParagraphMenu(e, text, p);
       });
     });
+  } else {
+    bindParagraphTranslation(container.querySelectorAll('p'));
   }
   
   updatePageIndicator();
@@ -2429,6 +2554,11 @@ async function preparePdfPagesForScroll(pdfDoc) {
   pdfState.currentPage = 1;
 }
 
+async function getBookIntroductionId(pdfData) {
+  const digest = await crypto.subtle.digest('SHA-256', pdfData);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 async function uploadPdfToCloudinary(file) {
   if (!file) return null;
 
@@ -2483,6 +2613,8 @@ async function loadPdfDocument(file) {
     pdfState.pageText = new Array(pdfDoc.numPages).fill('');
     pdfState.title = file.name;
     pdfState.cloudUrl = '';
+    const bookSummary = $('bookSummary');
+    if (bookSummary) bookSummary.hidden = true;
 
     const firstPage = await pdfDoc.getPage(1);
     const firstViewport = firstPage.getViewport({ scale: 1 });
@@ -2505,6 +2637,7 @@ async function loadPdfDocument(file) {
     }
 
     await preparePdfPagesForScroll(pdfDoc);
+    pdfState.bookId = await getBookIntroductionId(new Uint8Array(arrayBuffer));
     renderPages();
     readerArea.scrollTop = 0;
     $('pdfStatus').textContent = file.name;
@@ -2563,6 +2696,8 @@ function renderPdfPage(pageNumber) {
         showMobileParagraphMenu(e, text, p);
       });
     });
+  } else {
+    bindParagraphTranslation(paragraphs);
   }
 
   readerArea.scrollTop = 0;
@@ -2628,7 +2763,7 @@ function highlightSentence(index) {
     el.classList.remove('active', 'done');
     if (i < index) el.classList.add('done');
   });
-  
+
   if (index >= 0 && index < sentenceElements.length) {
     sentenceElements[index].classList.add('active');
     sentenceElements[index].scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -2638,49 +2773,72 @@ function highlightSentence(index) {
 
 function simulateNarrationWithHighlight(text, callback) {
   buildSentenceElements();
-  
-  const sentences = sentenceElements.map(el => el.textContent.trim());
-  if (sentences.length === 0) {
+
+  narrationSentenceCount = sentenceElements.length;
+  if (narrationSentenceCount === 0) {
     if (callback) callback();
     return;
   }
 
   isNarrating = true;
-  let index = 0;
-  
   if (highlightInterval) clearInterval(highlightInterval);
+  highlightSentence(0);
+  narrationCompleteCallback = callback || null;
+}
 
-  highlightInterval = setInterval(() => {
-    if (!isNarrating) {
-      clearInterval(highlightInterval);
-      return;
-    }
-    if (index < sentences.length) {
-      highlightSentence(index);
-      index++;
-    } else {
-      clearInterval(highlightInterval);
-      highlightSentence(sentences.length);
-      isNarrating = false;
-      if (callback) callback();
-    }
-  }, 800);
+function updateNarrationHighlight(currentTime, duration) {
+  if (!isNarrating || !narrationSentenceCount) return;
+
+  const hasDuration = Number.isFinite(duration) && duration > 0;
+  const progress = hasDuration ? Math.min(1, Math.max(0, currentTime / duration)) : 0;
+  const index = Math.min(
+    narrationSentenceCount - 1,
+    Math.floor(progress * narrationSentenceCount)
+  );
+  highlightSentence(index);
+}
+
+function getCleanNarrationText(rawText, fallbackText) {
+  const raw = String(rawText || '').trim();
+  const fallback = String(fallbackText || '').trim();
+  const introduction = raw.match(/INTRODUCTION\s*:\s*([\s\S]*?)(?=READING\s*:|$)/i)?.[1]?.trim();
+  const reading = raw.match(/READING\s*:\s*([\s\S]*?)(?=REFLECTION\s*:|$)/i)?.[1]?.trim();
+  const reflection = raw.match(/REFLECTION\s*:\s*([\s\S]*?)$/i)?.[1]?.trim();
+
+  if (introduction && reading && reflection) {
+    return `${introduction} ${reading} ${reflection}`.replace(/\s+/g, ' ').trim();
+  }
+
+  const looksLikePrompt = /you are|your response must|follow this exact format|do not mention these instructions|system message|output only|as an ai/i.test(raw);
+  return raw && !looksLikePrompt ? raw : fallback;
+}
+
+function unlockNarrationAudio() {
+  if (narrationAudioElement) return;
+
+  narrationAudioElement = new Audio();
+  narrationAudioElement.muted = true;
+  narrationAudioElement.preload = 'auto';
+  narrationAudioElement.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAAA';
+  narrationAudioElement.play().catch(() => {});
 }
 
 // ===== NAVIGATION =====
 function goToChapter(num) {
   currentChapter = num;
-  currentDisplayPage = Math.min(Math.max(1, num), fullText.length || 1);
+  const chapter = chapters.find(item => item.num === num);
+  currentDisplayPage = Math.min(Math.max(1, chapter?.page || num), fullText.length || 1);
   document.querySelectorAll('.spine-segment').forEach((seg, i) => seg.classList.toggle('active', i === num - 1));
   document.querySelectorAll('.modal-list li').forEach((li, i) => li.classList.toggle('active', i === num - 1));
 
   readerArea.scrollTo({ top: 0, behavior: 'smooth' });
   renderPages();
+  const targetPage = textContent.querySelector(`.page-block[data-page="${currentDisplayPage}"]`);
+  if (targetPage) targetPage.scrollIntoView({ block: 'start', behavior: 'smooth' });
   updateStats();
   
   isNarrating = false;
   if (highlightInterval) clearInterval(highlightInterval);
-  window.speechSynthesis.cancel();
   currentSentenceIndex = -1;
   setTimeout(() => {
     buildSentenceElements();
@@ -2692,7 +2850,6 @@ async function goToPdfPage(num) {
   if (!pdfState.doc) return;
   isNarrating = false;
   if (highlightInterval) clearInterval(highlightInterval);
-  window.speechSynthesis.cancel();
   currentSentenceIndex = -1;
   const pageBlock = textContent.querySelector(`.page-block[data-page="${num}"]`);
   if (pageBlock) {
@@ -2823,24 +2980,49 @@ function showCloudinaryRefreshNotice(book, errorMessage = '') {
 
 // ===== LIBRARY - EDITORIAL CATALOG =====
 const bookLogos = ['KOD', 'Kaom', 'MOD', 'MONAN', 'R*SE', 'Drople', 'Aquat', 'Cosem', 'GoFee', 'CÖFFEE', 'ONONS', 'FASO', 'Goodit', 'ecostar', 'MOON', 'Kaom'];
+let libraryBooksCache = null;
+let libraryBooksLoadPromise = null;
 
-async function loadGutendexBooks(searchQuery = '') {
+async function loadGutendexBooks(searchQuery = '', categoryFilter = $('libraryCategoryFilter')?.value || 'all', silent = false) {
   try {
-    $('libraryBooks').innerHTML = '<div class="library-status">Loading your shelf&hellip;</div>';
-    showToast('Loading books...', 'info');
-    const res = await fetch('/api/cloudinary-books', { cache: 'no-store' });
-    
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    
-    const data = await res.json();
-    const allBooks = Array.isArray(data.books) ? data.books : [];
+    if (!libraryBooksCache) {
+      if (!libraryBooksLoadPromise) {
+        libraryBooksLoadPromise = fetch('/api/cloudinary-books', { cache: 'no-store' })
+          .then(async res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            libraryBooksCache = Array.isArray(data.books) ? data.books : [];
+            return libraryBooksCache;
+          })
+          .finally(() => { libraryBooksLoadPromise = null; });
+      }
+      if (!silent) $('libraryBooks').innerHTML = '<div class="library-status">Loading your shelf and preparing introductions&hellip;</div>';
+      const allBooks = await libraryBooksLoadPromise;
+      if (silent) {
+        updateLibraryCount(allBooks.length, allBooks.length);
+        return;
+      }
+      return renderLibraryBooks(allBooks, searchQuery, categoryFilter, silent);
+    }
+
+    return renderLibraryBooks(libraryBooksCache, searchQuery, categoryFilter, silent);
+  } catch (err) {
+    console.error('Cloudinary books error:', err);
+    if (!silent) {
+      $('libraryBooks').innerHTML = `<div class="library-empty">Unable to load the library. ${escapeHtml(err.message)}</div>`;
+      updateLibraryCount(0, 0);
+      showToast('Failed to load books', 'error');
+    }
+  }
+}
+
+function renderLibraryBooks(allBooks, searchQuery = '', categoryFilter = 'all', silent = false) {
     const normalizedQuery = (searchQuery || '').trim().toLowerCase();
-    const filteredBooks = normalizedQuery
-      ? allBooks.filter(book => {
-          const haystack = `${book.title || ''} ${book.author || ''}`.toLowerCase();
-          return haystack.includes(normalizedQuery);
-        })
-      : allBooks;
+    const filteredBooks = allBooks.filter(book => {
+      const matchesCategory = categoryFilter === 'all' || (book.categories || []).includes(categoryFilter);
+      const haystack = `${book.title || ''} ${book.author || ''}`.toLowerCase();
+      return matchesCategory && (!normalizedQuery || haystack.includes(normalizedQuery));
+    });
 
     updateLibraryCount(filteredBooks.length, allBooks.length);
 
@@ -2861,11 +3043,15 @@ async function loadGutendexBooks(searchQuery = '') {
 
     const booksHtml = filteredBooks.map((book, idx) => {
       const title = escapeHtml(book.title || 'Untitled book');
+      const author = escapeHtml(book.author || '');
+      const cover = book.cover_url ? `<img class="book-cover" src="${escapeHtml(book.cover_url)}" alt="" loading="lazy" onerror="this.remove()">` : '';
       const number = String(idx + 1).padStart(2, '0');
       return `<div class="gutendex-book" data-book-idx="${idx}" role="button" tabindex="0" aria-label="Open ${title}">
         <span class="book-mark" aria-hidden="true"></span>
         <span class="book-index" aria-hidden="true">${number}</span>
+        ${cover}
         <span class="title">${title}</span>
+        <span class="author">${author}</span>
         <span class="action">Open book</span>
       </div>`;
     }).join('');
@@ -2873,21 +3059,119 @@ async function loadGutendexBooks(searchQuery = '') {
     $('libraryBooks').innerHTML = booksHtml || '<div class="library-empty">No books match that search.</div>';
     
     document.querySelectorAll('.gutendex-book').forEach((el, idx) => {
-      el.addEventListener('click', () => loadCloudinaryBook(filteredBooks[idx]));
+      el.addEventListener('click', () => loadLibraryBook(filteredBooks[idx]));
       el.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          loadCloudinaryBook(filteredBooks[idx]);
+          loadLibraryBook(filteredBooks[idx]);
         }
       });
     });
     
-    showToast(`Loaded ${filteredBooks.length} of ${allBooks.length} books`, 'success', 1500);
-  } catch (err) {
-    console.error('Cloudinary books error:', err);
-    $('libraryBooks').innerHTML = `<div class="library-empty">Unable to load the library. ${escapeHtml(err.message)}</div>`;
-    updateLibraryCount(0, 0);
-    showToast('Failed to load books', 'error');
+    if (!silent) showToast(`Loaded ${filteredBooks.length} of ${allBooks.length} books. Introductions are generating in the background.`, 'success', 2500);
+}
+
+async function loadLibraryBook(book) {
+  console.info('[Book Reader] Book summary', {
+    title: book?.title || 'Untitled book',
+    author: book?.author || 'Unknown author',
+    source: book?.source || 'Local library',
+    summary: String(book?.summary || '').trim() || 'No source summary available'
+  });
+  const loadPromise = book?.source === 'Standard Ebooks' || book?.source === 'Project Gutenberg'
+    ? loadStandardEbook(book)
+    : loadCloudinaryBook(book);
+  await loadPromise;
+
+  if (book?.title && book?.author) {
+    const researchUrl = `/api/book-research?title=${encodeURIComponent(book.title)}&author=${encodeURIComponent(book.author)}`;
+    void fetch(researchUrl, { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(result => {
+        if (result) {
+          console.info('[Book Reader] Online book research', result);
+          const research = result.research || {};
+          let summary = String(book.summary || research.description || '').trim();
+          const bookSummary = $('bookSummary');
+          if (bookSummary && summary) {
+            bookSummary.innerHTML = `<strong>Book summary</strong>${escapeHtml(summary)}`;
+            bookSummary.hidden = false;
+          }
+          if (!summary && book.source === 'Standard Ebooks' && book.source_url) {
+            return fetch(`/api/standardebooks-file?url=${encodeURIComponent(book.source_url)}`, { cache: 'no-store' })
+              .then(response => response.ok ? response.text() : '')
+              .then(markup => {
+                const sourceDocument = new DOMParser().parseFromString(markup, 'text/html');
+                summary = sourceDocument.querySelector('meta[name="description"]')?.content?.replace(/^Free epub ebook download of the Standard Ebooks edition of [^:]+:\s*/i, '').trim() || '';
+                if (bookSummary && summary) {
+                  bookSummary.innerHTML = `<strong>Book summary</strong>${escapeHtml(summary)}`;
+                  bookSummary.hidden = false;
+                }
+              });
+          }
+        }
+      })
+      .catch(error => console.warn('[Book Reader] Online research unavailable:', error.message));
+  }
+}
+
+async function loadStandardEbook(book) {
+  try {
+    showToast(`Loading ${book.title}...`, 'info');
+    const response = await fetch(book.url, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Standard Ebooks returned ${response.status}`);
+    const markup = await response.text();
+    const documentContent = new DOMParser().parseFromString(markup, book.format === 'text' ? 'text/html' : 'application/xhtml+xml');
+    const root = documentContent.querySelector('body') || documentContent.documentElement;
+    const contentNodes = book.format === 'text' ? [] : Array.from(root?.querySelectorAll('main h1, main h2, main h3, main h4, main p, main blockquote, main li') || []);
+    const contentBlocks = book.format === 'text'
+      ? markup.split(/\r?\n\s*\r?\n+/).map(normalizeNarrationText).filter(Boolean)
+      : contentNodes.map(node => normalizeNarrationText(node.textContent || '')).filter(Boolean);
+    const fallbackText = normalizeNarrationText(root?.textContent || '');
+    if (!contentBlocks.length && fallbackText) contentBlocks.push(fallbackText);
+    if (!contentBlocks.length) throw new Error('No readable text found in this Standard Ebooks title');
+
+    const pageTexts = [];
+    let currentPage = '';
+    contentBlocks.forEach(block => {
+      if (currentPage && `${currentPage}\n\n${block}`.length > 5000) {
+        pageTexts.push(currentPage);
+        currentPage = '';
+      }
+      currentPage = currentPage ? `${currentPage}\n\n${block}` : block;
+    });
+    if (currentPage) pageTexts.push(currentPage);
+
+    pdfState.doc = null;
+    pdfState.currentPage = 1;
+    pdfState.totalPages = pageTexts.length;
+    pdfState.pageHtml = pageTexts;
+    pdfState.pageText = pageTexts;
+    pdfState.title = book.title;
+    pdfState.bookId = '';
+    const bookSummary = $('bookSummary');
+    if (bookSummary) {
+      const summary = String(book.summary || '').trim();
+      bookSummary.innerHTML = summary ? `<strong>Book summary</strong>${escapeHtml(summary)}` : '';
+      bookSummary.hidden = !summary;
+    }
+    bookTitleDisplay.textContent = book.title;
+    fullText.length = 0;
+    fullText.push(...pageTexts);
+    syncChaptersFromBook();
+    currentChapter = 1;
+    currentDisplayPage = 1;
+    landingPage.style.display = 'none';
+    readerMode.classList.add('active');
+    readerControls.classList.add('active');
+    renderPages();
+    initSpine();
+    initChapterList();
+    closeLibraryModal();
+    showToast(`Loaded: ${book.title}`, 'success', 2000);
+  } catch (error) {
+    console.error('Standard Ebooks load error:', error);
+    showToast(`Failed to load book: ${error.message}`, 'error');
   }
 }
 
@@ -2934,6 +3218,9 @@ async function loadCloudinaryBook(book) {
     }
 
     bookTitleDisplay.textContent = book.title;
+    pdfState.bookId = await getBookIntroductionId(uint8Array);
+    const bookSummary = $('bookSummary');
+    if (bookSummary) bookSummary.hidden = true;
 
     landingPage.style.display = 'none';
     readerMode.classList.add('active');
@@ -3038,7 +3325,11 @@ $('searchBtn').addEventListener('click', openSearchModal);
 
 $('librarySearchBtn').addEventListener('click', () => {
   const query = $('librarySearchInput').value.trim();
-  loadGutendexBooks(query);
+  loadGutendexBooks(query, $('libraryCategoryFilter').value);
+});
+
+$('libraryCategoryFilter').addEventListener('change', () => {
+  loadGutendexBooks($('librarySearchInput').value.trim(), $('libraryCategoryFilter').value);
 });
 
 $('librarySearchInput').addEventListener('keypress', (e) => {
@@ -3046,6 +3337,8 @@ $('librarySearchInput').addEventListener('keypress', (e) => {
     $('librarySearchBtn').click();
   }
 });
+
+void loadGutendexBooks('', 'all', true);
 
 $('searchInput').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') {
@@ -3111,6 +3404,15 @@ function getLanguageCodeForVoice(language) {
   return map[normalized.toLowerCase()] || normalized || 'en-US';
 }
 
+function removeNarrationBoilerplate(text) {
+  return String(text || '')
+    .replace(/Download free eBooks?[^.?!]*(?:[.?!]|$)/gi, '')
+    .replace(/Subscribe to (?:our|the) free eBooks? blog[^.?!]*(?:[.?!]|$)/gi, '')
+    .replace(/(?:free eBooks? blog|email newsletter|newsletter via email)[^.?!]*(?:[.?!]|$)/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function getNarrationSegmentsForElement(rootNode) {
   const segments = [];
 
@@ -3118,20 +3420,30 @@ function getNarrationSegmentsForElement(rootNode) {
     if (!node) return;
 
     if (node.nodeType === Node.TEXT_NODE) {
-      const text = (node.textContent || '').trim();
+      const text = removeNarrationBoilerplate(node.textContent || '');
       if (text) {
-        segments.push({ text, language: 'en-US' });
+        segments.push({ text, language: 'en-US', element: node.parentElement });
       }
       return;
     }
 
     if (node.nodeType !== Node.ELEMENT_NODE) return;
 
+    if (node.classList && node.classList.contains('page-number')) return;
+    if (node.classList && node.classList.contains('page-chapter-title')) return;
+
+    if (node.classList && node.classList.contains('translated-paragraph')) {
+      const text = removeNarrationBoilerplate(node.textContent || '');
+      const language = getLanguageCodeForVoice(node.dataset.translationLang || 'fr');
+      if (text) segments.push({ text, language, element: node });
+      return;
+    }
+
     if (node.classList && node.classList.contains('translated-text')) {
-      const text = (node.textContent || '').trim();
+      const text = removeNarrationBoilerplate(node.textContent || '');
       const language = getLanguageCodeForVoice(node.dataset.translationLang || 'fr');
       if (text) {
-        segments.push({ text, language });
+        segments.push({ text, language, element: node });
       }
       return;
     }
@@ -3143,7 +3455,106 @@ function getNarrationSegmentsForElement(rootNode) {
   return segments.filter(segment => segment.text && segment.text.length > 0);
 }
 
-async function readNarrationSegmentsSequentially(segments, index = 0) {
+function normalizeNarrationText(rawText) {
+  return removeNarrationBoilerplate(rawText)
+    .replace(/\u00ad/g, '')
+    .replace(/([A-Za-z])[-\u2010\u2011]\s+([a-z])/g, '$1$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getFullBookNarrationSegments() {
+  const pages = pdfState.doc ? pdfState.pageText : fullText;
+  const segments = [];
+  const paragraphElements = Array.from(textContent?.querySelectorAll('p') || []);
+  let paragraphIndex = 0;
+
+  pages.forEach(pageText => {
+    const paragraphs = String(pageText || '')
+      .split(/\n\s*\n+/)
+      .map(normalizeNarrationText)
+      .filter(Boolean);
+
+    paragraphs.forEach(paragraph => {
+      const sentences = splitIntoSentences(paragraph);
+      let chunk = '';
+      const element = paragraphElements[paragraphIndex++] || null;
+
+      sentences.forEach(sentence => {
+        if (chunk && `${chunk} ${sentence}`.length > 800) {
+          segments.push({ text: chunk, language: 'en-US', element });
+          chunk = '';
+        }
+        chunk = chunk ? `${chunk} ${sentence}` : sentence;
+      });
+
+      if (chunk) segments.push({ text: chunk, language: 'en-US', element });
+    });
+  });
+
+  return segments;
+}
+
+function getCurrentNarrationRoot() {
+  if (!textContent) return null;
+  const pageNumber = pdfState.doc ? pdfState.currentPage : currentDisplayPage;
+  return textContent.querySelector(`.page-block[data-page="${pageNumber}"]`) || textContent;
+}
+
+const NARRATION_PAUSE_MS = 80;
+
+function cleanReadingIntroduction(rawText) {
+  const introduction = String(rawText || '')
+    .replace(/^(?:Introduction|INTRODUCTION)\s*:\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!introduction || introduction.length > 500) return '';
+
+  const promptLeak = /you are|return only|output only|analyze only|book title:|first four pages|supplied pages|your instructions|system prompt|do not (?:quote|summarize|mention|add)|response must|translation|mental draft/i;
+  return promptLeak.test(introduction) ? '' : introduction;
+}
+
+async function generateReadingIntroduction() {
+  if (!pdfState.bookId) return '';
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2500);
+  try {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const response = await fetch(`/api/introductions/${encodeURIComponent(pdfState.bookId)}`, {
+        cache: 'no-store',
+        signal: controller.signal
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const intro = cleanReadingIntroduction(result.intro || '');
+        if (intro) return intro;
+      } else if (response.status !== 404) {
+        console.warn(`Saved reading introduction returned ${response.status}`);
+        break;
+      }
+
+      if (attempt < 4) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+  } catch (error) {
+    console.warn('Saved reading introduction unavailable:', error.message);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  console.warn('Introduction is not ready; starting book audio directly');
+  return '';
+}
+
+function speakNarrationAsync(text, language = 'en-US', onStart, onProgress) {
+  return new Promise(resolve => {
+    speakNarration(text, resolve, language, onStart, onProgress);
+  });
+}
+
+async function readNarrationSegmentsSequentially(segments, index = 0, onSegmentStart = null, onSegmentProgress = null) {
   if (!segments || !segments.length) return;
 
   const segment = segments[index];
@@ -3152,58 +3563,79 @@ async function readNarrationSegmentsSequentially(segments, index = 0) {
   await new Promise((resolve) => {
     speakNarration(segment.text, () => {
       if (index < segments.length - 1) {
-        readNarrationSegmentsSequentially(segments, index + 1).then(resolve);
+        setTimeout(() => {
+          readNarrationSegmentsSequentially(segments, index + 1, onSegmentStart, onSegmentProgress).then(resolve);
+        }, NARRATION_PAUSE_MS);
       } else {
         resolve();
       }
-    }, segment.language || 'en-US');
+    }, segment.language || 'en-US',
+    () => { if (onSegmentStart) onSegmentStart(index, segment); },
+    (currentTime, duration) => { if (onSegmentProgress) onSegmentProgress(index, currentTime, duration); });
   });
 }
 
-function speakNarrationLocal(text, callback, language = 'en-US') {
-  if (!window.speechSynthesis) { if (callback) callback(); return; }
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.90;
-  utter.pitch = 0.98;
-  utter.volume = 1;
-  utter.lang = getLanguageCodeForVoice(language);
-  const voices = window.speechSynthesis.getVoices();
-  const normalizedLang = getLanguageCodeForVoice(language).toLowerCase();
-  const preferred = voices.find(v => (v.lang || '').toLowerCase().startsWith(normalizedLang.slice(0, 2)))
-    || voices.find(v => (v.name || '').toLowerCase().includes('samantha') || (v.name || '').toLowerCase().includes('karen'))
-    || voices.find(v => (v.lang || '').toLowerCase().startsWith('en'));
-  if (preferred) utter.voice = preferred;
-  if (callback) utter.onend = callback;
-  window.speechSynthesis.speak(utter);
+function highlightNarrationSegment(segment, index, segments) {
+  segments.forEach(item => {
+    if (item.element) item.element.classList.remove('narration-active', 'narration-done');
+  });
+  if (segment?.element) segment.element.classList.add('narration-active');
+  segments.slice(0, index).forEach(item => {
+    if (item.element) item.element.classList.add('narration-done');
+  });
 }
 
-async function speakNarration(text, callback, language = 'en-US') {
+function clearNarrationHighlights() {
+  document.querySelectorAll('.narration-active, .narration-done, .sentence.active, .sentence.done')
+    .forEach(element => element.classList.remove('narration-active', 'narration-done', 'active', 'done'));
+}
+
+async function speakNarration(text, callback, language = 'en-US', onStart, onProgress) {
   if (!text || !text.trim()) { if (callback) callback(); return; }
 
   const normalizedLanguage = getLanguageCodeForVoice(language);
-  const isNonEnglish = !(normalizedLanguage.toLowerCase().startsWith('en'));
-
-  if (isNonEnglish) {
-    speakNarrationLocal(text, callback, normalizedLanguage);
-    return;
-  }
+  const useBrowserSpeechFallback = (error) => {
+    console.warn('Audio playback unavailable; using browser speech fallback:', error?.message || error);
+    if (!window.speechSynthesis) {
+      if (callback) callback();
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.trim());
+    utterance.lang = normalizedLanguage;
+    utterance.rate = 0.92;
+    utterance.volume = 1;
+    utterance.onstart = () => { if (onStart) onStart(); };
+    utterance.onend = () => { if (callback) callback(); };
+    utterance.onerror = () => { if (callback) callback(); };
+    window.speechSynthesis.speak(utterance);
+  };
 
   try {
     const response = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim() })
+      body: JSON.stringify({ text: text.trim(), language: normalizedLanguage })
     });
 
     if (!response.ok) {
-      throw new Error(`ElevenLabs request failed: ${response.status}`);
+      throw new Error(`Piper request failed: ${response.status}`);
     }
 
     const audioBlob = await response.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
+    const audio = narrationAudioElement || new Audio();
+    audio.pause();
+    audio.muted = false;
+    audio.src = audioUrl;
+    audio.load();
     audio.volume = 1;
+    audio.onplay = () => {
+      if (onStart) onStart();
+    };
+    audio.ontimeupdate = () => {
+      if (onProgress) onProgress(audio.currentTime, audio.duration);
+    };
     audio.onended = () => {
       URL.revokeObjectURL(audioUrl);
       if (callback) callback();
@@ -3215,8 +3647,8 @@ async function speakNarration(text, callback, language = 'en-US') {
     await audio.play();
     return;
   } catch (err) {
-    console.warn('ElevenLabs failed, falling back to browser voice:', err);
-    speakNarrationLocal(text, callback, normalizedLanguage);
+    console.error('Piper narration failed:', err);
+    useBrowserSpeechFallback(err);
   }
 }
 
@@ -3224,34 +3656,39 @@ async function speakNarration(text, callback, language = 'en-US') {
 async function callAI(input, mode) {
   if (!input) return;
   const safeInput = String(input).slice(0, 6000);
-  const ctx = getPageContext().slice(0, 3000);
+  const currentPageContext = getCurrentPageContext().slice(0, 6000);
+  const bookOverview = getBookOverviewContext(5).slice(0, 6000);
+  const bookTitle = (bookTitleDisplay?.textContent || '').trim() || 'the current book';
+  const chapterTitle = (document.querySelector('.page-chapter-title')?.textContent || '').trim() || 'the current chapter';
   let prompt = '';
-  const systemMsg = `You are a world-class female audiobook narrator and literary guide. Your voice is warm, mature, elegant, intelligent, intimate, and deeply human. Speak slowly, calmly, and deliberately, with natural breathing, gentle pauses, and expressive but restrained emotion. Never rush.
+  const systemMsg = `You are a calm, literary audiobook narrator and thoughtful guide. Create narration that feels like a quiet human reading beside the listener: warm, mature, elegant, intimate, clear, and deeply present. Use short natural sentences, gentle transitions, and reflective pauses. Never rush, lecture, over-explain, or sound like a chatbot.
 
-You do not sound like a chatbot, AI assistant, commercial narrator, or text-to-speech engine. You sound like an experienced woman sitting beside the listener, thoughtfully sharing a meaningful book.
+When introducing a passage, begin naturally with its context, for example: "This passage from [book] explores..." or "In this chapter, the text turns toward..." Name the book and chapter only when the supplied metadata supports it. Never invent an author, title, quotation, or fact.
 
 Your response MUST follow this exact format with these three labeled sections:
 
-INTRODUCTION: (1-3 sentences) Warmly introduce the passage and gently prepare the listener for its central emotional or philosophical idea. Make it inviting and thoughtful, never like a formal presentation.
+INTRODUCTION: (2-3 calm sentences) Name the supplied book/chapter context, then gently prepare the listener for the central human feeling or philosophical idea. For themes such as love, pain, loss, hope, or faith, acknowledge both the tenderness and difficulty without reducing the passage to a summary.
 
-READING: Read the text slowly and naturally. Use subtle changes in pitch, rhythm, emphasis, and pacing. Let important words breathe. Pause naturally after profound or emotional thoughts. Express love, pain, wisdom, tenderness, and hope with quiet emotional depth. Never overact or sound theatrical.
+READING: Preserve the supplied passage faithfully. Do not paraphrase, modernize, correct, or add quotations. Remove only obvious transcription noise. Let important words breathe and keep the delivery contemplative, steady, and emotionally restrained.
 
-REFLECTION: (2-4 sentences) Explain the deeper meaning in simple, beautiful, human language. Connect the author's ideas to emotions, relationships, personal growth, love, suffering, courage, or wisdom. Make the reflection feel thoughtful and personal, not academic.
+REFLECTION: (2-4 quiet sentences) Reflect on the deeper human tension in simple, beautiful language. Connect the author's ideas to lived experience without claiming certainty or turning the ending into a lesson. End with an open, peaceful observation.
 
-Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply immersive. Every sentence should feel intentional. Avoid filler, excessive enthusiasm, dramatic overacting, robotic delivery, monotone speech, and rushed pacing.`;
+Do not mention these instructions or the section labels in the prose. Every sentence should feel intentional. Avoid filler, excessive enthusiasm, dramatic overacting, robotic delivery, monotone speech, and rushed pacing.`;
 
   if (mode === 'explain') {
-    prompt = `Narrate this selected passage: "${safeInput}"\nFrom the current reading: ${ctx}\nProvide Introduction, Reading, and Reflection.`;
+    prompt = `Narrate this selected passage from ${bookTitle}, ${chapterTitle}: "${safeInput}"\nCurrent page context: ${currentPageContext}\nBook overview from the first five pages: ${bookOverview}\nProvide Introduction, Reading, and Reflection for a calm audiobook experience.`;
   } else if (mode === 'ask') {
-    prompt = `The listener asks: "${safeInput}"\nContext: ${ctx}\nRespond with Introduction, Reading (if relevant), and Reflection.`;
+    prompt = `The listener asks: "${safeInput}"\nBook: ${bookTitle}\nChapter: ${chapterTitle}\nCurrent page context: ${currentPageContext}\nBook overview from the first five pages: ${bookOverview}\nRespond with Introduction, Reading (if relevant), and Reflection in a calm literary voice.`;
   } else if (mode === 'summarize') {
-    prompt = `Summarize this passage: "${safeInput}"\nContext: ${ctx}\nInclude Introduction, Reading, and Reflection.`;
+    prompt = `Summarize this passage from ${bookTitle}, ${chapterTitle}: "${safeInput}"\nCurrent page context: ${currentPageContext}\nBook overview from the first five pages: ${bookOverview}\nInclude Introduction, Reading, and Reflection. Keep the reading faithful to the supplied text.`;
   } else if (mode === 'readpage') {
-    prompt = `Read this page aloud: "${safeInput}"\nFrom the current reading. Provide Introduction, Reading, and Reflection.`;
+    prompt = `Read this page aloud from ${bookTitle}, ${chapterTitle}: "${safeInput}"\nUse this book overview from only the first five pages to understand the context: ${bookOverview}\nProvide Introduction, Reading, and Reflection. Make the opening feel like a calm audiobook welcome, then preserve the page text faithfully.`;
   } else return;
 
   try {
     showToast('Preparing narration...', 'info', 1500);
+    const groqController = new AbortController();
+    const groqTimeout = setTimeout(() => groqController.abort(), 12000);
 
     const resp = await fetch('/api/groq', {
       method: 'POST',
@@ -3263,11 +3700,23 @@ Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply imme
           { role: 'user', content: prompt }
         ],
         max_tokens: 600
-      })
+      }),
+      signal: groqController.signal
     });
+    clearTimeout(groqTimeout);
 
     if (!resp.ok) {
-      showToast('Service unavailable', 'error');
+      showToast('Groq unavailable. Reading this page directly...', 'info', 2500);
+      if (mode === 'readpage') {
+        await speakNarration(safeInput, () => {
+          isNarrating = false;
+          showToast('Page reading complete', 'success', 1500);
+        }, 'en-US', () => {
+          simulateNarrationWithHighlight(safeInput);
+        }, (currentTime, duration) => {
+          updateNarrationHighlight(currentTime, duration);
+        });
+      }
       return;
     }
 
@@ -3275,27 +3724,44 @@ Overall, sound peaceful, sophisticated, emotionally intelligent, and deeply imme
     let answer = data.choices?.[0]?.message?.content || "Let me reflect on that.";
     answer = answer.replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').trim();
 
-    const introMatch = answer.match(/INTRODUCTION[:]\s*([\s\S]*?)(?=READING[:]|$)/i);
-    const readingMatch = answer.match(/READING[:]\s*([\s\S]*?)(?=REFLECTION[:]|$)/i);
-    const reflectionMatch = answer.match(/REFLECTION[:]\s*([\s\S]*?)$/i);
+    const speakingText = getCleanNarrationText(answer, safeInput);
+    const readingText = getCleanNarrationText(
+      answer.match(/READING\s*:\s*([\s\S]*?)(?=REFLECTION\s*:|$)/i)?.[1],
+      safeInput
+    );
 
-    let speakingText = answer;
-    if (introMatch && readingMatch && reflectionMatch) {
-      speakingText = `${introMatch[1].trim()} ${readingMatch[1].trim()} ${reflectionMatch[1].trim()}`;
-    }
-
-    let readingText = readingMatch ? readingMatch[1].trim() : safeInput;
-    
-    simulateNarrationWithHighlight(readingText, () => {
-      showToast('Narration complete', 'success', 1500);
-    });
     await speakNarration(speakingText, () => {
+      isNarrating = false;
+      highlightSentence(narrationSentenceCount);
+      if (narrationCompleteCallback) {
+        const complete = narrationCompleteCallback;
+        narrationCompleteCallback = null;
+        complete();
+      }
       showToast('Voice playback complete', 'success', 1500);
+    }, 'en-US', () => {
+      simulateNarrationWithHighlight(readingText, () => {
+        showToast('Narration complete', 'success', 1500);
+      });
+    }, (currentTime, duration) => {
+      updateNarrationHighlight(currentTime, duration);
     });
 
   } catch (e) {
     console.error(e);
-    showToast('Error: ' + e.message, 'error');
+    if (mode === 'readpage') {
+      showToast('Starting page audio directly...', 'info', 2500);
+      await speakNarration(safeInput, () => {
+        isNarrating = false;
+        showToast('Page reading complete', 'success', 1500);
+      }, 'en-US', () => {
+        simulateNarrationWithHighlight(safeInput);
+      }, (currentTime, duration) => {
+        updateNarrationHighlight(currentTime, duration);
+      });
+    } else {
+      showToast('Error: ' + e.message, 'error');
+    }
   }
 }
 
@@ -3310,23 +3776,27 @@ $('aiExplainBtn').addEventListener('click', async () => {
 
 $('aiSummarizeBtn').addEventListener('click', async () => {
   if (isNarrating) { showToast('Narration in progress...', 'info'); return; }
-  const t = getPageContext();
+  const t = getCurrentPageContext();
   await callAI(t, 'summarize');
 });
 
 $('aiReadPageBtn').addEventListener('click', async () => {
   if (isNarrating) { showToast('Narration in progress...', 'info'); return; }
-  const pageSegments = Array.from((textContent || document.body).querySelectorAll('.page-block p'))
-    .flatMap((paragraph) => getNarrationSegmentsForElement(paragraph));
-
-  if (!pageSegments.length) return showToast('No text to read', 'error');
-
+  unlockNarrationAudio();
+  const bookSegments = getFullBookNarrationSegments();
+  if (!bookSegments.length) return showToast('No text to read', 'error');
+  showToast('Preparing the complete book...', 'info', 1500);
   isNarrating = true;
-  try {
-    await readNarrationSegmentsSequentially(pageSegments);
-  } finally {
-    isNarrating = false;
+
+  const introduction = await generateReadingIntroduction();
+  if (introduction) {
+    bookSegments.unshift({ text: normalizeNarrationText(introduction), language: 'en-US', element: null });
   }
+
+  narrationSentenceCount = bookSegments.length;
+  await readNarrationSegmentsSequentially(bookSegments);
+  isNarrating = false;
+  showToast('Complete book reading finished', 'success', 1500);
 });
 
 let activeSelectionRange = null;
@@ -3566,10 +4036,25 @@ function applyHighlightSelection(rangeOverride = null) {
 }
 
 $('readAloudBtn').addEventListener('click', async () => {
-  const t = selectedText || getPageContext();
-  if (!t) return showToast('Select text first', 'error');
-  showToast('Reading with AI voice...', 'info');
-  await speakNarration(t, () => { showToast('Done reading', 'success', 1500); });
+  if (isNarrating) return showToast('Narration in progress...', 'info');
+  const selectedRoot = activeSelectionRange?.startContainer?.parentElement?.closest('p');
+  const hasSelection = Boolean(selectedRoot);
+  const segments = hasSelection
+    ? getNarrationSegmentsForElement(selectedRoot)
+    : getFullBookNarrationSegments();
+  if (!segments.length) return showToast('No text to read', 'error');
+  unlockNarrationAudio();
+  showToast(hasSelection ? 'Reading selected text...' : 'Preparing the complete book...', 'info');
+  isNarrating = true;
+  if (!hasSelection) {
+    const introduction = await generateReadingIntroduction();
+    if (introduction) segments.unshift({ text: normalizeNarrationText(introduction), language: 'en-US', element: null });
+  }
+  narrationSentenceCount = segments.length;
+  await readNarrationSegmentsSequentially(segments);
+  isNarrating = false;
+  highlightSentence(narrationSentenceCount);
+  showToast('Done reading', 'success', 1500);
   $('selectionToolbar').style.display = 'none';
 });
 
@@ -3649,7 +4134,19 @@ $('noteBtn').addEventListener('click', () => {
 });
 
 $('translateBtn').addEventListener('click', () => {
-  if (!selectedText) return showToast('Select text', 'error');
+  console.debug('[translation] button clicked', {
+    selectedText: String(selectedText || '').slice(0, 80),
+    hasActiveRange: Boolean(activeSelectionRange),
+    browserSelection: window.getSelection()?.toString().trim().slice(0, 80) || ''
+  });
+  const browserText = window.getSelection()?.toString().trim() || '';
+  const text = selectedText || browserText;
+  if (!text) return showToast('Select text', 'error');
+  pendingTranslationText = text;
+  pendingTranslationParagraph = activeSelectionRange?.startContainer?.parentElement?.closest('p')
+    || window.getSelection()?.anchorNode?.parentElement?.closest('p')
+    || null;
+  if (!selectedText) selectedText = text;
   $('selectionToolbar').style.display = 'none';
   
   const langs = { 'es': 'Spanish', 'fr': 'French', 'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ru': 'Russian', 'zh': 'Chinese', 'rw': 'Kinyarwanda', 'sw': 'Kiswahili' };
@@ -3666,77 +4163,213 @@ $('translateBtn').addEventListener('click', () => {
   setTimeout(() => { const s = document.getElementById('translateLangSelect'); if (s) s.focus(); }, 100);
 });
 
+function findTextRange(root, targetText) {
+  const target = String(targetText || '').trim();
+  if (!root || !target) {
+    console.warn('[translation] range search skipped', { hasRoot: Boolean(root), targetLength: target.length });
+    return null;
+  }
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let fullText = '';
+  let node;
+
+  while ((node = walker.nextNode())) {
+    nodes.push({ node, start: fullText.length });
+    fullText += node.textContent || '';
+  }
+
+  const matchStart = fullText.indexOf(target);
+  if (matchStart === -1) {
+    console.warn('[translation] range search found no match', {
+      targetLength: target.length,
+      rootTextLength: fullText.length
+    });
+    return null;
+  }
+  const matchEnd = matchStart + target.length;
+  const startNode = nodes.find(item => matchStart >= item.start && matchStart <= item.start + item.node.length);
+  const endNode = nodes.find(item => matchEnd >= item.start && matchEnd <= item.start + item.node.length);
+  if (!startNode || !endNode) return null;
+
+  const range = document.createRange();
+  range.setStart(startNode.node, matchStart - startNode.start);
+  range.setEnd(endNode.node, matchEnd - endNode.start);
+  console.debug('[translation] range found', { targetLength: target.length, textNodeCount: nodes.length });
+  return range;
+}
+
 async function performTranslate(text, targetLang) {
+  const selectedRangeText = activeSelectionRange?.toString().trim()
+    || window.getSelection()?.toString().trim()
+    || String(text || '').trim();
+  const selectedParagraph = pendingTranslationParagraph
+    || activeSelectionRange?.startContainer?.parentElement?.closest('p')
+    || mobileSelectedParagraphNode?.closest('p');
+  const translationText = selectedParagraph?.textContent?.trim() || selectedRangeText;
+  const translationPreview = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+  console.debug('[translation] start', {
+    language: targetLang,
+    textLength: String(text || '').length,
+    translationTextLength: translationText.length,
+    preview: translationPreview,
+    hasActiveRange: Boolean(activeSelectionRange),
+    hasBrowserSelection: Boolean(window.getSelection()?.toString().trim()),
+    hasMobileParagraph: Boolean(mobileSelectedParagraphNode)
+  });
+
   try {
     showToast('Translating...', 'info');
     const res = await fetch('/api/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, target_language: targetLang, targetLang })
+      body: JSON.stringify({ text: translationText, target_language: targetLang, targetLang })
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
+      const errorBody = await res.text();
+      console.error('[translation] API failed', {
+        status: res.status,
+        statusText: res.statusText,
+        body: errorBody.slice(0, 300)
+      });
+      const errorData = JSON.parse(errorBody || '{}');
       throw new Error(errorData.error || `Translation failed: ${res.status}`);
     }
 
     const data = await res.json();
-    const translated = data.translated || text;
+    const translated = String(data.translated || data.translatedText || '').trim();
+    if (!translated) throw new Error('The translation response was empty');
+    console.debug('[translation] API succeeded', {
+      responseKeys: Object.keys(data),
+      translatedLength: translated.length,
+      translatedPreview: translated.replace(/\s+/g, ' ').slice(0, 80)
+    });
     const normalizedLang = String(targetLang || 'fr').trim();
 
     let range = null;
     const sel = window.getSelection();
-    if (sel && sel.rangeCount && sel.toString().trim()) {
-      range = sel.getRangeAt(0);
+    if (selectedParagraph) {
+      range = document.createRange();
+      range.selectNodeContents(selectedParagraph);
+      console.debug('[translation] using containing paragraph range');
+    } else if (activeSelectionRange && activeSelectionRange.toString().trim()) {
+      range = activeSelectionRange.cloneRange();
+      console.debug('[translation] using active selection range');
+    } else if (sel && sel.rangeCount && sel.toString().trim()) {
+      range = sel.getRangeAt(0).cloneRange();
+      console.debug('[translation] using browser selection range');
     } else if (mobileSelectedParagraphNode) {
       range = document.createRange();
       range.selectNodeContents(mobileSelectedParagraphNode);
+      console.debug('[translation] using mobile paragraph range');
     }
 
-    if (range) {
-      const span = document.createElement('span');
-      span.className = 'translated-text';
-      span.dataset.translationLang = normalizedLang;
-      span.dataset.originalText = text;
-      span.style.background = '#e8f0e0';
-      span.style.cursor = 'pointer';
-      span.textContent = translated;
-      span.title = 'Click to restore';
-      span.onclick = function (e) {
-        e.stopPropagation();
-        if (confirm('Restore original?')) {
-          const parent = this.parentNode;
-          parent.replaceChild(document.createTextNode(text), this);
-          parent.normalize();
-        }
-      };
-
-      if (range.startContainer && range.startContainer.parentNode && range.startContainer.parentNode.closest('.page-block')) {
-        range.deleteContents();
-        range.insertNode(span);
-      } else if (mobileSelectedParagraphNode && mobileSelectedParagraphNode.closest('.page-block')) {
-        mobileSelectedParagraphNode.textContent = translated;
-        mobileSelectedParagraphNode.dataset.translationLang = normalizedLang;
-        mobileSelectedParagraphNode.dataset.originalText = text;
-        mobileSelectedParagraphNode.classList.add('translated-paragraph');
+    if (!range && text) {
+      const paragraphs = textContent?.querySelectorAll('p') || [];
+      for (const paragraph of paragraphs) {
+        range = findTextRange(paragraph, text);
+        if (range) break;
       }
     }
+
+    if (!range) {
+      console.error('[translation] no DOM range found', {
+        textLength: String(text || '').length,
+        readerTextLength: textContent?.textContent?.length || 0,
+        paragraphCount: textContent?.querySelectorAll('p').length || 0
+      });
+      throw new Error('Selected text is no longer available on the page');
+    }
+
+    if (sel) sel.removeAllRanges();
+
+    const startElement = range.startContainer.nodeType === Node.ELEMENT_NODE
+      ? range.startContainer
+      : range.startContainer.parentElement;
+    const endElement = range.endContainer.nodeType === Node.ELEMENT_NODE
+      ? range.endContainer
+      : range.endContainer.parentElement;
+    const startParagraph = startElement?.closest('p');
+    const endParagraph = endElement?.closest('p');
+    const targetParagraph = selectedParagraph || startParagraph || mobileSelectedParagraphNode?.closest('p');
+
+    if (targetParagraph && targetParagraph.closest('.page-block') && range.toString().trim() === targetParagraph.textContent.trim()) {
+      const originalText = targetParagraph.textContent || '';
+      targetParagraph.dataset.originalText = originalText;
+      targetParagraph.dataset.translationLang = normalizedLang;
+      targetParagraph.dataset.translated = 'true';
+      targetParagraph.textContent = translated;
+      targetParagraph.classList.add('translated-paragraph');
+      targetParagraph.style.cursor = 'pointer';
+      targetParagraph.title = 'Click to restore original';
+      targetParagraph.onclick = function (event) {
+        event.stopPropagation();
+        if (!confirm('Restore original text?')) return;
+        this.textContent = this.dataset.originalText || text;
+        this.dataset.translated = 'false';
+        this.dataset.originalText = '';
+        this.classList.remove('translated-paragraph');
+        this.title = '';
+        showToast('Restored original', 'info', 1500);
+      };
+      console.debug('[translation] paragraph replaced successfully');
+    } else if (targetParagraph && targetParagraph.closest('.page-block')) {
+      targetParagraph.dataset.originalText = targetParagraph.textContent || text;
+      targetParagraph.dataset.translationLang = normalizedLang;
+      targetParagraph.dataset.translated = 'true';
+      targetParagraph.textContent = translated;
+      targetParagraph.classList.add('translated-paragraph');
+      targetParagraph.style.cursor = 'pointer';
+      targetParagraph.title = 'Click to restore original';
+      targetParagraph.onclick = function (event) {
+        event.stopPropagation();
+        if (!confirm('Restore original text?')) return;
+        this.textContent = this.dataset.originalText || text;
+        this.dataset.translated = 'false';
+        this.dataset.originalText = '';
+        this.dataset.translationLang = '';
+        this.classList.remove('translated-paragraph');
+        this.title = '';
+      };
+      console.debug('[translation] selected paragraph replaced successfully');
+    }
+
+    console.debug('[translation] DOM updated', {
+      rendered: textContent?.textContent.includes(translated),
+      translatedSpanCount: textContent?.querySelectorAll('.translated-text').length || 0
+    });
 
     selectedText = translated;
     mobileSelectedParagraphText = translated;
     showToast('Translated', 'success');
   } catch (e) {
-    console.error('Translation error:', e);
-    showToast('Translation error', 'error');
+    console.error('[translation] error', e);
+    showToast(`Translation error: ${e.message}`, 'error', 5000);
   }
 }
 
 function performTranslateWithSelect() {
   const select = document.getElementById('translateLangSelect');
+  if (!select) {
+    console.error('[translation] language selector not found');
+    showToast('Translation language selector is missing', 'error');
+    return;
+  }
   const lang = select.value;
   if (!lang) { showToast('Select a language', 'error'); return; }
   select.parentElement.remove();
-  performTranslate(selectedText, lang);
+  const sourceText = pendingTranslationText || selectedText;
+  if (!sourceText) {
+    showToast('Select text', 'error');
+    return;
+  }
+  console.debug('[translation] language selected', {
+    language: lang,
+    textLength: sourceText.length
+  });
+  performTranslate(sourceText, lang);
 }
 
 function saveNote(modal = null) {
@@ -3767,7 +4400,6 @@ function saveNote(modal = null) {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
-    window.speechSynthesis.cancel();
     isNarrating = false;
     if (highlightInterval) clearInterval(highlightInterval);
     if (window.__resetTimerModal) window.__resetTimerModal();
@@ -3860,6 +4492,7 @@ function initTimerModal() {
   let timerInterval = null;
   let topicPool = [];
   let translatedTopicPool = [];
+  let translationRateLimitedUntil = 0;
   let topicLanguage = topicLanguageSelect ? topicLanguageSelect.value : 'en';
   const circumference = 2 * Math.PI * 85;
   const aiChoosingText = 'AI is choosing a topic...';
@@ -3902,28 +4535,31 @@ function initTimerModal() {
       return [...topics];
     }
 
-    const translated = await Promise.allSettled(topics.map(async (topic) => {
-      try {
-        const res = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: topic, targetLang })
-        });
+    if (Date.now() < translationRateLimitedUntil) {
+      return [...topics];
+    }
 
-        if (!res.ok) {
-          console.warn(`Translation failed for topic with status ${res.status}`);
-          return topic;
-        }
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts: topics, targetLang })
+      });
 
-        const data = await res.json();
-        return data.translated || topic;
-      } catch (err) {
-        console.warn('Topic translation failed:', err.message || err);
-        return topic;
+      if (!res.ok) {
+        if (res.status === 429) translationRateLimitedUntil = Date.now() + 60000;
+        return [...topics];
       }
-    }));
 
-    return translated.map(result => result.status === 'fulfilled' ? result.value : result.reason?.original || result.reason || '');
+      const data = await res.json();
+      if (Array.isArray(data.translations) && data.translations.length === topics.length) {
+        return data.translations.map((translation, index) => translation || topics[index]);
+      }
+    } catch (err) {
+      console.warn('Topic translation failed:', err.message);
+    }
+
+    return [...topics];
   }
 
   async function refreshTranslatedTopicPool(force = false) {
@@ -3976,10 +4612,10 @@ function initTimerModal() {
     let sourceText = '';
 
     if (pdfState.doc) {
-      const pageTexts = pdfState.pageText.filter(Boolean);
+      const pageTexts = pdfState.pageText.filter(Boolean).slice(0, 5);
       sourceText = pageTexts.length ? pageTexts.join('\n\n') : getPageContext();
     } else {
-      sourceText = getPageContext() || fullText.join('\n\n');
+      sourceText = getPageContext() || fullText.slice(0, 5).join('\n\n');
     }
 
     if (!sourceText.trim()) return buildFallbackTopics();
@@ -4003,7 +4639,7 @@ Each topic should be short, clear, interesting, and easy to understand. Keep eac
 
 Output ONLY valid JSON as an array of exactly 10 strings. No markdown, no numbering, no explanations.
 
-Book content:
+Book content from the first five pages:
 ${sourceText.slice(0, 12000)}`;
       const response = await fetch('/api/groq', {
         method: 'POST',

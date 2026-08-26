@@ -3,3 +3,6 @@ transformers
 Pillow
 soundfile
 numpy
+fastapi
+uvicorn
+piper-tts

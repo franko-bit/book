@@ -15,14 +15,4 @@ model.save_pretrained(save_path)
 print(f'✅ Downloaded {model_name} to {save_path}')
 "
 
-# Download TTS model
-python3 -c "
-from transformers import AutoTokenizer, AutoModelForTextToWaveform
-model_name = 'myshell-ai/MeloTTS-English-v2'
-save_path = 'hf_models/myshell-ai/MeloTTS-English-v2'
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForTextToWaveform.from_pretrained(model_name)
-tokenizer.save_pretrained(save_path)
-model.save_pretrained(save_path)
-print(f'✅ Downloaded {model_name} to {save_path}')
-"
+# Piper voices are downloaded separately after checking the voice model license.

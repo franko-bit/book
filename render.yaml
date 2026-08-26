@@ -5,6 +5,7 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: node backend.js
+    healthCheckPath: /api/health
     envVars:
       - key: GROQ_API_KEY
         sync: false
@@ -15,6 +16,26 @@ services:
       - key: CLOUDINARY_API_SECRET
         sync: false
       - key: ELEVENLABS_API_KEY
-        sync: false
+        value: paused
       - key: ELEVENLABS_VOICE_ID
         sync: false
+      - key: TTS_PROVIDER
+        value: piper
+      - key: PIPER_HOSTPORT
+        fromService:
+          type: web
+          name: piper-tts
+          property: hostport
+
+  - type: web
+    name: piper-tts
+    env: python
+    plan: free
+    buildCommand: pip install -r local_inference/requirements.txt && python download_piper_voice.py --voice lessac --quality high
+    startCommand: uvicorn local_inference.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PIPER_MODEL
+        value: local_inference/voices/reader01/en_US-lessac-high.onnx
+      - key: TTS_CACHE_DIR
+        value: local_inference/generated

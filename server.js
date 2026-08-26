@@ -1216,9 +1216,11 @@ async function runPodcastTurnFixed(type, pageContext, userText = '') {
       state.podcastAudio.onended = () => {
         state.podcastAudio = null;
         if (podcastStateFixed.active && !podcastStateFixed.paused) {
-          const statusEl2 = document.getElementById('podcastStatus');
-          if (statusEl2) statusEl2.textContent = '🎤 Listening...';
-          startSpeechRecognitionFixed();
+          setTimeout(() => {
+            const statusEl2 = document.getElementById('podcastStatus');
+            if (statusEl2) statusEl2.textContent = '🎤 Listening...';
+            startSpeechRecognitionFixed();
+          }, 500);
         }
       };
       
